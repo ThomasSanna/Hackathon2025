@@ -205,7 +205,9 @@ class OCRProcessor:
         self,
         ocr_response: OCRResponse,
         output_dir: Path,
-        source_filename: str = ""
+        source_filename: str = "",
+        page_offset: int = 0,
+        total_pages_in_doc: int = None
     ) -> Tuple[List[Path], List[dict]]:
         """
         Traite la réponse OCR et génère un markdown par page avec frontmatter.
@@ -214,6 +216,8 @@ class OCRProcessor:
             ocr_response: Réponse de l'API OCR
             output_dir: Dossier de sortie
             source_filename: Nom du fichier source
+            page_offset: Offset pour la numérotation des pages (pour traitement par blocs)
+            total_pages_in_doc: Nombre total de pages dans le document complet
             
         Returns:
             Tuple (liste des chemins markdown, images_info)
@@ -225,10 +229,12 @@ class OCRProcessor:
         all_images_info = []
         
         document_annotation = getattr(ocr_response, 'document_annotation', None)
-        total_pages = len(ocr_response.pages)
+        total_pages = total_pages_in_doc if total_pages_in_doc else len(ocr_response.pages)
         
         # D'abord, collecter et sauvegarder toutes les images
         for page_idx, page in enumerate(ocr_response.pages):
+            actual_page_number = page_offset + page_idx + 1
+            
             for img_idx, img in enumerate(page.images):
                 img_id = img.id
                 
@@ -242,14 +248,14 @@ class OCRProcessor:
                     else:
                         ext = '.png'
                     
-                    img_filename = f"page{page_idx + 1}_img{img_idx + 1}{ext}"
+                    img_filename = f"page{actual_page_number}_img{img_idx + 1}{ext}"
                     img_path = images_dir / img_filename
                     
                     if self.save_base64_image(base64_str, img_path):
                         img_info = {
                             "id": img_id,
                             "filename": img_filename,
-                            "page": page_idx + 1,
+                            "page": actual_page_number,
                             "position": {
                                 "top_left_x": getattr(img, 'top_left_x', None),
                                 "top_left_y": getattr(img, 'top_left_y', None),
@@ -265,15 +271,15 @@ class OCRProcessor:
         
         # Générer un fichier markdown par page
         for page_idx, page in enumerate(ocr_response.pages):
-            page_number = page_idx + 1
+            actual_page_number = page_offset + page_idx + 1
             
             # Filtrer les images de cette page
-            page_images = [img for img in all_images_info if img["page"] == page_number]
+            page_images = [img for img in all_images_info if img["page"] == actual_page_number]
             
             # Générer le frontmatter pour cette page
             frontmatter = self.generate_page_frontmatter(
                 source_file=source_filename,
-                page_number=page_number,
+                page_number=actual_page_number,
                 total_pages=total_pages,
                 document_annotation=document_annotation,
                 page_images_info=page_images
@@ -318,7 +324,7 @@ class OCRProcessor:
             full_content = frontmatter + "\n" + page_markdown
             
             # Sauvegarder le fichier markdown de la page
-            page_filename = f"page_{page_number}.md"
+            page_filename = f"page_{actual_page_number}.md"
             page_path = output_dir / page_filename
             
             with open(page_path, 'w', encoding='utf-8') as f:
@@ -335,18 +341,19 @@ class OCRProcessor:
         output_base_dir: Path,
         use_bbox_annotation: bool = True,
         use_document_annotation: bool = True,
-        max_pages: int = 8
+        max_pages: int = 32
     ) -> Dict:
         """
         Traite un fichier PDF avec l'API Mistral OCR et génère un markdown par page.
+        Traite le document par blocs de 8 pages pour contourner la limite API.
         
         Args:
             pdf_content: Contenu binaire du PDF
             filename: Nom du fichier original
             output_base_dir: Dossier de base pour la sortie
             use_bbox_annotation: Activer l'annotation des images
-            use_document_annotation: Activer l'annotation du document
-            max_pages: Nombre maximum de pages pour document_annotation (limite: 8)
+            use_document_annotation: Activer l'annotation du document (uniquement 1er bloc)
+            max_pages: Nombre maximum de pages à traiter (max: 32 pages = 4 blocs de 8)
             
         Returns:
             Dictionnaire avec les résultats du traitement
@@ -364,45 +371,74 @@ class OCRProcessor:
             "document_url": f"data:application/pdf;base64,{base64_content}"
         }
         
-        # Préparer les paramètres de l'appel OCR
-        ocr_params = {
-            "model": "mistral-ocr-latest",
-            "document": document_config,
-            "include_image_base64": True
-        }
+        # Limiter au maximum 32 pages (4 blocs de 8)
+        max_pages = min(max_pages, 32)
         
-        # Ajouter les formats d'annotation si demandés
-        if use_bbox_annotation:
-            ocr_params["bbox_annotation_format"] = response_format_from_pydantic_model(ImageAnnotation)
+        # Calculer le nombre de blocs nécessaires (8 pages par bloc)
+        num_blocks = (max_pages + 7) // 8  # Arrondi supérieur
         
-        if use_document_annotation:
-            ocr_params["document_annotation_format"] = response_format_from_pydantic_model(DocumentAnnotation)
-            if max_pages is None: # Si non spécifié, pas de limité
-                ocr_params["pages"] = None
-            else : 
-                ocr_params["pages"] = list(range(max_pages))
+        all_markdown_paths = []
+        all_images_info = []
+        document_annotation = None
         
-        # Appel à l'API OCR
-        try:
-            ocr_response = self.client.ocr.process(**ocr_params)
-        except Exception as e:
-            raise Exception(f"Erreur lors de l'OCR: {str(e)}")
-        
-        # Traiter la réponse et générer un markdown par page
-        markdown_paths, images_info = self.process_ocr_response_per_page(
-            ocr_response,
-            output_dir,
-            source_filename=filename
-        )
+        # Traiter chaque bloc de 8 pages
+        for block_idx in range(num_blocks):
+            start_page = block_idx * 8
+            end_page = min(start_page + 8, max_pages)
+            pages_range = list(range(start_page, end_page))
+            
+            print(f"📄 Traitement du bloc {block_idx + 1}/{num_blocks}: pages {start_page + 1} à {end_page}")
+            
+            # Préparer les paramètres de l'appel OCR pour ce bloc
+            ocr_params = {
+                "model": "mistral-ocr-latest",
+                "document": document_config,
+                "include_image_base64": True,
+                "pages": pages_range
+            }
+            
+            # Ajouter les formats d'annotation si demandés
+            if use_bbox_annotation:
+                ocr_params["bbox_annotation_format"] = response_format_from_pydantic_model(ImageAnnotation)
+            
+            # Document annotation uniquement pour le premier bloc
+            if use_document_annotation and block_idx == 0:
+                ocr_params["document_annotation_format"] = response_format_from_pydantic_model(DocumentAnnotation)
+            
+            # Appel à l'API OCR pour ce bloc
+            try:
+                ocr_response = self.client.ocr.process(**ocr_params)
+            except Exception as e:
+                raise Exception(f"Erreur lors de l'OCR du bloc {block_idx + 1}: {str(e)}")
+            
+            # Capturer le document_annotation du premier bloc
+            if block_idx == 0 and hasattr(ocr_response, 'document_annotation'):
+                document_annotation = ocr_response.document_annotation
+            
+            # Traiter la réponse et générer un markdown par page
+            markdown_paths, images_info = self.process_ocr_response_per_page(
+                ocr_response,
+                output_dir,
+                source_filename=filename,
+                page_offset=start_page,
+                total_pages_in_doc=max_pages
+            )
+            
+            all_markdown_paths.extend(markdown_paths)
+            all_images_info.extend(images_info)
         
         # Sauvegarder les métadonnées JSON globales
         metadata = {
             "source_file": filename,
-            "total_pages": len(ocr_response.pages),
-            "total_images": len(images_info),
-            "document_annotation": ocr_response.document_annotation if hasattr(ocr_response, 'document_annotation') else None,
-            "markdown_files": [str(p.name) for p in markdown_paths],
-            "images": images_info
+            "total_pages": len(all_markdown_paths),
+            "total_images": len(all_images_info),
+            "document_annotation": document_annotation,
+            "markdown_files": [str(p.name) for p in all_markdown_paths],
+            "images": all_images_info,
+            "processing_info": {
+                "blocks_processed": num_blocks,
+                "max_pages_limit": max_pages
+            }
         }
         
         metadata_path = output_dir / f"{base_name}_metadata.json"
@@ -411,9 +447,9 @@ class OCRProcessor:
         
         return {
             "output_dir": str(output_dir),
-            "markdown_files": [str(p) for p in markdown_paths],
+            "markdown_files": [str(p) for p in all_markdown_paths],
             "metadata_path": str(metadata_path),
-            "total_pages": len(ocr_response.pages),
-            "total_images": len(images_info),
+            "total_pages": len(all_markdown_paths),
+            "total_images": len(all_images_info),
             "metadata": metadata
         }

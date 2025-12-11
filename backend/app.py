@@ -9,6 +9,7 @@ from pathlib import Path
 from datetime import datetime
 from outils.commandes_vocales import VoiceCommandAgent, CommandResponse, create_default_config
 from outils.ocr_processor import OCRProcessor
+from outils.statistique_lecture import analyser_texte_lu
 
 app = FastAPI()
 
@@ -35,6 +36,11 @@ class VoiceCommandRequest(BaseModel):
     """Requete de commande vocale"""
     command: str
     config: Optional[Dict[str, Any]] = None
+
+
+class TextAnalysisRequest(BaseModel):
+    """Requete d'analyse de texte"""
+    texte: str
 
 
 @app.get("/")
@@ -70,16 +76,17 @@ async def process_pdf_ocr(
     file: UploadFile = File(...),
     use_bbox_annotation: bool = True,
     use_document_annotation: bool = True,
-    max_pages: int = 8
+    max_pages: int = 32
 ):
     """
     Traite un fichier PDF avec l'API Mistral OCR et génère un markdown par page.
+    Traite jusqu'à 32 pages par blocs de 8 pages pour contourner la limite API.
     
     Args:
         file: Fichier PDF à traiter
         use_bbox_annotation: Activer l'annotation des images/graphiques
-        use_document_annotation: Activer l'annotation du document entier
-        max_pages: Nombre maximum de pages pour document_annotation (limite API: 8)
+        use_document_annotation: Activer l'annotation du document (appliqué aux 8 premières pages)
+        max_pages: Nombre maximum de pages à traiter (limite: 32 pages = 4 blocs de 8)
         
     Returns:
         JSON avec les chemins des fichiers générés et les métadonnées
@@ -122,5 +129,38 @@ async def process_pdf_ocr(
         raise HTTPException(
             status_code=500,
             detail=f"Erreur lors du traitement OCR: {str(e)}"
+        )
+
+
+@app.post("/api/stats/analyse-texte")
+async def analyse_texte(request: TextAnalysisRequest):
+    """
+    Analyse un texte et retourne des statistiques de lecture détaillées.
+    
+    Args:
+        request: Requête contenant le texte à analyser
+        
+    Returns:
+        JSON avec toutes les statistiques du texte
+    """
+    if not request.texte or not request.texte.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Le texte ne peut pas être vide"
+        )
+    
+    try:
+        # Analyser le texte avec la fonction de statistiques
+        stats = analyser_texte_lu(request.texte)
+        
+        return JSONResponse(content={
+            "success": True,
+            "data": stats
+        })
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de l'analyse du texte: {str(e)}"
         )
 
