@@ -1,0 +1,186 @@
+---
+const { frontmatter } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{frontmatter.title || "Liseuse"}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<button id="fullscreen-btn" title="Mode plein écran">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+		</button>
+		<main class="reader-container">
+			<article class="markdown-content">
+				<slot />
+			</article>
+		</main>
+
+		<script>
+			const btn = document.getElementById('fullscreen-btn');
+			
+			btn?.addEventListener('click', () => {
+				if (!document.fullscreenElement) {
+					document.documentElement.requestFullscreen().catch(e => {
+						console.error("Impossible de passer en plein écran automatiquement :", e);
+					});
+				} else {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					}
+				}
+			});
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--bg-color: #f9f7f1; /* Couleur crème douce / Papier ancien */
+		--text-color: #333333; /* Gris très foncé, moins agressif que le noir pur */
+		--accent-color: #8c5e58; /* Une couleur terreuse pour les liens/accents */
+		--font-body: 'Merriweather', serif;
+		--font-heading: 'Open Sans', sans-serif;
+	}
+
+	html, body {
+		margin: 0;
+		padding: 0;
+		background-color: var(--bg-color);
+		color: var(--text-color);
+		font-family: var(--font-body);
+		line-height: 1.8; /* Espacement généreux pour la lecture */
+	}
+
+	.reader-container {
+		max-width: 720px; /* Largeur optimale pour la lecture (environ 60-75 caractères) */
+		margin: 0 auto;
+		padding: 4rem 2rem;
+		min-height: 100vh;
+	}
+
+	.markdown-content {
+		font-size: 1.125rem; /* 18px pour le confort */
+	}
+
+	#fullscreen-btn {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		color: var(--text-color);
+		opacity: 0.3;
+		transition: all 0.2s;
+		padding: 10px;
+		border-radius: 50%;
+		z-index: 100;
+	}
+
+	#fullscreen-btn:hover {
+		opacity: 1;
+		background: rgba(0,0,0,0.05);
+		transform: scale(1.1);
+	}
+
+	/* Titres */
+	h1, h2, h3, h4, h5, h6 {
+		font-family: var(--font-heading);
+		color: #1a1a1a;
+		margin-top: 2.5em;
+		margin-bottom: 1em;
+		line-height: 1.3;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+		border-bottom: 2px solid var(--accent-color);
+		padding-bottom: 0.5rem;
+		margin-top: 0;
+	}
+
+	h2 {
+		font-size: 1.8rem;
+	}
+
+	/* Paragraphes */
+	p {
+		margin-bottom: 1.5em;
+	}
+
+	/* Liens */
+	a {
+		color: var(--accent-color);
+		text-decoration: none;
+		border-bottom: 1px dotted var(--accent-color);
+		transition: all 0.2s ease;
+	}
+
+	a:hover {
+		background-color: rgba(140, 94, 88, 0.1);
+	}
+
+	/* Citations */
+	blockquote {
+		border-left: 4px solid var(--accent-color);
+		margin: 2em 0;
+		padding-left: 1.5em;
+		font-style: italic;
+		color: #555;
+		background: rgba(0,0,0,0.02);
+		padding: 1rem;
+		border-radius: 0 8px 8px 0;
+	}
+
+	/* Code */
+	code {
+		background-color: #eaddcf;
+		padding: 0.2em 0.4em;
+		border-radius: 4px;
+		font-family: monospace;
+		font-size: 0.9em;
+	}
+
+	pre {
+		background-color: #2d2d2d;
+		color: #f8f8f2;
+		padding: 1.5rem;
+		border-radius: 8px;
+		overflow-x: auto;
+		margin: 2em 0;
+	}
+	
+	pre code {
+		background-color: transparent;
+		color: inherit;
+		padding: 0;
+	}
+
+	/* Images */
+	img {
+		max-width: 100%;
+		height: auto;
+		border-radius: 8px;
+		margin: 2em 0;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+	}
+
+	/* Listes */
+	ul, ol {
+		margin-bottom: 1.5em;
+		padding-left: 2em;
+	}
+	
+	li {
+		margin-bottom: 0.5em;
+	}
+</style>

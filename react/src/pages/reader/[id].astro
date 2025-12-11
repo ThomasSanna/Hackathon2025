@@ -1,0 +1,115 @@
+---
+import ReaderLayout from '../../layouts/ReaderLayout.astro';
+import type { MarkdownInstance } from 'astro';
+
+interface Frontmatter {
+  document_title?: string;
+  page_number?: number;
+  [key: string]: any;
+}
+
+export async function getStaticPaths() {
+  // Récupère tous les fichiers markdown dans output_2
+  const allPages = await Astro.glob<Frontmatter>('../output_2/**/*.md');
+  
+  // Regroupe les pages par dossier (ID du document)
+  const pagesByDoc: Record<string, MarkdownInstance<Frontmatter>[]> = {};
+  
+  allPages.forEach((page) => {
+    // Le chemin du fichier est dans page.file
+    // Exemple: .../src/pages/output_2/23248.Zeendoc/page_1.md
+    // Gestion des séparateurs de chemin Windows/Unix
+    const parts = page.file.split(/[/\\]/);
+    // On suppose que la structure est .../output_2/[dossier]/[fichier]
+    // On cherche l'index de output_2 pour trouver le dossier suivant
+    const outputIndex = parts.indexOf('output_2');
+    if (outputIndex !== -1 && parts.length > outputIndex + 1) {
+      const docId = parts[outputIndex + 1];
+      
+      if (!pagesByDoc[docId]) {
+        pagesByDoc[docId] = [];
+      }
+      pagesByDoc[docId].push(page);
+    }
+  });
+
+  // Crée les chemins pour chaque document
+  return Object.keys(pagesByDoc).map((docId) => {
+    // Trie les pages par numéro de page (supposant que le frontmatter a page_number ou le nom de fichier)
+    const sortedPages = pagesByDoc[docId].sort((a, b) => {
+      const pageA = a.frontmatter.page_number || parseInt(a.file.match(/page_(\d+)/)?.[1] || "0");
+      const pageB = b.frontmatter.page_number || parseInt(b.file.match(/page_(\d+)/)?.[1] || "0");
+      return pageA - pageB;
+    });
+
+    return {
+      params: { id: docId },
+      props: { pages: sortedPages, docId },
+    };
+  });
+}
+
+interface Props {
+  pages: MarkdownInstance<Frontmatter>[];
+  docId: string;
+}
+
+const { pages, docId } = Astro.props;
+const title = pages[0]?.frontmatter?.document_title || docId;
+---
+
+<ReaderLayout frontmatter={{ title: title }}>
+  <div class="document-container">
+    <h1 class="document-title">{title}</h1>
+    
+    <div class="pages-list">
+      {pages.map((Page) => (
+        <div class="page-container" id={`page-${Page.frontmatter.page_number}`}>
+          <div class="page-header">Page {Page.frontmatter.page_number}</div>
+          <div class="page-content">
+            <Page.Content />
+          </div>
+          <hr class="page-separator" />
+        </div>
+      ))}
+    </div>
+  </div>
+</ReaderLayout>
+
+<style>
+  .document-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .document-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--accent-color);
+  }
+
+  .page-container {
+    margin-bottom: 4rem;
+    background: white;
+    padding: 3rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-radius: 4px;
+  }
+
+  .page-header {
+    font-size: 0.8rem;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: right;
+  }
+
+  .page-separator {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin-top: 3rem;
+    display: none; /* Caché car on a des boites séparées */
+  }
+</style>
