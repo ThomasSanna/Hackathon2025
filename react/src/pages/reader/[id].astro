@@ -61,6 +61,8 @@ const title = pages[0]?.frontmatter?.document_title || docId;
 
 // Fusion du contenu
 let fullMarkdown = "";
+// Contenu paginé pour le mobile
+const pagesContent: string[] = [];
 
 pages.forEach((page, index) => {
   try {
@@ -78,6 +80,7 @@ pages.forEach((page, index) => {
       rawBody = content; // Pas de frontmatter ?
     }
 
+    // --- Logique pour la version Desktop (Fusionnée) ---
     // Gestion de la fusion avec la page précédente
     if (fullMarkdown.length > 0) {
       // Vérifie si la fin du texte précédent est un tiret (césure)
@@ -91,22 +94,33 @@ pages.forEach((page, index) => {
     } else {
       fullMarkdown = rawBody;
     }
+
+    // --- Logique pour la version Mobile (Paginée) ---
+    // On nettoie juste un peu le contenu individuel
+    let pageBody = rawBody;
+    // Correction des chemins d'images pour cette page
+    pageBody = pageBody.replace(/\]\(images\//g, `](/images/${docId}/`);
+    pageBody = pageBody.replace(/src="images\//g, `src="/images/${docId}/`);
+    
+    pagesContent.push(marked.parse(pageBody, { breaks: true }) as string);
+
   } catch (e) {
     console.error(`Erreur lecture fichier ${page.file}`, e);
   }
 });
 
-// Correction des chemins d'images
+// Correction des chemins d'images (Desktop)
 // Remplace "images/nom_image.jpg" par "/images/DOC_ID/nom_image.jpg"
 fullMarkdown = fullMarkdown.replace(/\]\(images\//g, `](/images/${docId}/`);
 fullMarkdown = fullMarkdown.replace(/src="images\//g, `src="/images/${docId}/`);
 
-// Conversion en HTML
+// Conversion en HTML (Desktop)
 const contentHtml = marked.parse(fullMarkdown, { breaks: true });
 ---
 
 <ReaderLayout frontmatter={{ title: title }}>
-  <div class="document-container" id="doc-container">
+  <!-- Version Desktop (Scroll Vertical Continu) -->
+  <div class="document-container desktop-view" id="doc-container">
     <h1 class="document-title">{title}</h1>
     
     <div class="pages-list">
@@ -116,97 +130,157 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     </div>
   </div>
 
+  <!-- Version Mobile (Slider Horizontal) -->
+  <div class="mobile-view" id="mobile-reader">
+    <div class="mobile-slider" id="mobile-slider">
+      {pagesContent.map((html, index) => (
+        <div class="mobile-page">
+          <div class="mobile-page-content page-content" set:html={html} />
+          <div class="mobile-page-number">{index + 1} / {pagesContent.length}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+
   <!-- Barre d'outils flottante -->
   <button id="settings-toggle" class="settings-toggle" title="Paramètres d'affichage">
     Aa
   </button>
 
   <div id="settings-bar" class="settings-bar">
-    <div class="setting-group" style="margin-bottom: 1.5rem;">
-      <label>Thème</label>
+    <!-- Onglets -->
+    <div class="settings-tabs">
+      <button class="tab-btn active" data-tab="text">Texte</button>
+      <button class="tab-btn" data-tab="theme">Thème</button>
+    </div>
+
+    <!-- Contenu Onglet Texte -->
+    <div id="tab-text" class="tab-content active">
+      <!-- Police -->
+      <div class="setting-row font-family-row">
+        <button class="font-btn active" data-font="Helvetica" style="font-family: Helvetica;">Sans</button>
+        <button class="font-btn" data-font="Georgia" style="font-family: Georgia;">Serif</button>
+        <button class="font-btn" data-font="OpenDyslexic" style="font-family: OpenDyslexic;">Dys</button>
+      </div>
+
+      <!-- Taille -->
+      <div class="setting-row size-row">
+        <button id="font-decrease" class="control-btn">T-</button>
+        <span id="font-size-display">100%</span>
+        <button id="font-increase" class="control-btn">T+</button>
+      </div>
+
+      <!-- Espacement -->
+      <div class="setting-row spacing-row">
+        <button class="control-btn spacing-btn" data-spacing="1.2" title="Compact">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button class="control-btn spacing-btn active" data-spacing="1.6" title="Normal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+        </button>
+        <button class="control-btn spacing-btn" data-spacing="2.0" title="Large">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16M4 12h16M4 20h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu Onglet Thème -->
+    <div id="tab-theme" class="tab-content">
       <div class="theme-selector">
         <button class="theme-btn theme-light" data-theme="theme-light" title="Clair">A</button>
         <button class="theme-btn theme-sepia" data-theme="theme-sepia" title="Sépia">A</button>
         <button class="theme-btn theme-dark" data-theme="theme-dark" title="Sombre">A</button>
       </div>
     </div>
-
-    <div class="setting-group">
-      <label for="font-size-slider">Taille du texte</label>
-      <div class="range-wrapper">
-        <span class="small-a">A</span>
-        <input type="range" id="font-size-slider" min="14" max="32" value="16" step="1">
-        <span class="big-a">A</span>
-      </div>
-    </div>
-
-    <div class="setting-group" style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
-      <label style="display: flex; align-items: center; justify-content: center; cursor: pointer;">
-        <input type="checkbox" id="dyslexia-toggle-reader" style="margin-right: 0.5rem; width: 1.2rem; height: 1.2rem; accent-color: var(--accent-color);">
-        <span>Mode Dyslexie (OpenDyslexic)</span>
-      </label>
-    </div>
   </div>
 
-  <!-- Contrôle de Zoom Flottant -->
-  <div class="zoom-widget">
-    <button id="zoom-out" class="zoom-btn" title="Réduire">-</button>
-    <div class="zoom-info">
-      <span class="zoom-icon">🔍</span>
-      <span id="zoom-value-display">100%</span>
-    </div>
-    <button id="zoom-in" class="zoom-btn" title="Agrandir">+</button>
+  <!-- Contrôle de Zoom Flottant (Supprimé) -->
+  <!-- <div class="zoom-widget">...</div> -->
+
+  <!-- Barre de progression de lecture -->
+  <div class="reading-progress-container">
+    <div id="reading-progress-bar" class="reading-progress-bar"></div>
   </div>
 </ReaderLayout>
 
 <script>
   const params = new URLSearchParams(window.location.search);
   const docContainer = document.getElementById('doc-container');
-  const dyslexiaToggle = document.getElementById('dyslexia-toggle-reader') as HTMLInputElement;
+  const mobileReader = document.getElementById('mobile-reader');
+  // const dyslexiaToggle = document.getElementById('dyslexia-toggle-reader') as HTMLInputElement; // Supprimé car géré dans les onglets maintenant
 
-  // Initialisation du mode dyslexie via URL
+  // Initialisation du mode dyslexie via URL (Legacy support)
   if (params.get('dyslexia') === 'true') {
     docContainer?.classList.add('dyslexia');
-    if (dyslexiaToggle) dyslexiaToggle.checked = true;
+    mobileReader?.classList.add('dyslexia');
+    // if (dyslexiaToggle) dyslexiaToggle.checked = true;
   }
 
-  // Gestion du toggle dyslexie dans la barre
+  /*
+  // Gestion du toggle dyslexie dans la barre (Ancien code)
   dyslexiaToggle?.addEventListener('change', (e) => {
     if ((e.target as HTMLInputElement).checked) {
       docContainer?.classList.add('dyslexia');
+      mobileReader?.classList.add('dyslexia');
     } else {
       docContainer?.classList.remove('dyslexia');
+      mobileReader?.classList.remove('dyslexia');
     }
   });
+  */
 
   // Gestion de la barre de paramètres
   const toggleBtn = document.getElementById('settings-toggle');
   const settingsBar = document.getElementById('settings-bar');
-  const fontSizeSlider = document.getElementById('font-size-slider');
-  const contentArea = document.getElementById('content-area');
+  const contentAreas = document.querySelectorAll('.page-content');
   const pagesList = document.querySelector('.pages-list') as HTMLElement;
   const themeBtns = document.querySelectorAll('.theme-btn');
 
-  toggleBtn?.addEventListener('click', () => {
-    settingsBar?.classList.toggle('visible');
+  // Onglets
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Reset active states
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      // Set active
+      btn.classList.add('active');
+      const tabId = btn.getAttribute('data-tab');
+      document.getElementById(`tab-${tabId}`)?.classList.add('active');
+    });
   });
 
-  // Gestion du Zoom Flottant
-  const zoomInBtn = document.getElementById('zoom-in');
-  const zoomOutBtn = document.getElementById('zoom-out');
-  const zoomValueDisplay = document.getElementById('zoom-value-display');
-  
-  let currentZoom = 100;
+  // Police
+  const fontBtns = document.querySelectorAll('.font-btn');
+  fontBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      fontBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const font = btn.getAttribute('data-font');
+      contentAreas.forEach(area => {
+        (area as HTMLElement).style.fontFamily = font || 'inherit';
+      });
+    });
+  });
+
+  // Taille (Zoom)
+  let currentZoom = 100; // Pourcentage
+  const fontDecreaseBtn = document.getElementById('font-decrease');
+  const fontIncreaseBtn = document.getElementById('font-increase');
+  const fontSizeDisplay = document.getElementById('font-size-display');
 
   function updateZoom(newZoom: number) {
     currentZoom = Math.max(50, Math.min(200, newZoom)); // Limites 50% - 200%
+    const scale = currentZoom / 100;
     
     // Mise à jour affichage
-    if (zoomValueDisplay) zoomValueDisplay.textContent = `${currentZoom}%`;
+    if (fontSizeDisplay) fontSizeDisplay.textContent = `${currentZoom}%`;
     
-    // Application du zoom
+    // Application du zoom Desktop
     if (pagesList) {
-      const scale = currentZoom / 100;
       // @ts-ignore
       pagesList.style.zoom = scale;
       
@@ -216,16 +290,40 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
         pagesList.style.transformOrigin = 'top center';
       }
     }
+
+    // Application du zoom Mobile
+    const mobilePages = document.querySelectorAll('.mobile-page-content');
+    mobilePages.forEach(page => {
+      const p = page as HTMLElement;
+      // @ts-ignore
+      p.style.zoom = scale;
+      
+      // Fallback Firefox
+      if (getComputedStyle(p).zoom === '1' && scale !== 1) {
+        p.style.transform = `scale(${scale})`;
+        p.style.transformOrigin = 'top left';
+      }
+    });
   }
 
-  zoomInBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    updateZoom(currentZoom + 10);
+  fontDecreaseBtn?.addEventListener('click', () => updateZoom(currentZoom - 10));
+  fontIncreaseBtn?.addEventListener('click', () => updateZoom(currentZoom + 10));
+
+  // Espacement
+  const spacingBtns = document.querySelectorAll('.spacing-btn');
+  spacingBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      spacingBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const spacing = btn.getAttribute('data-spacing');
+      contentAreas.forEach(area => {
+        (area as HTMLElement).style.lineHeight = spacing || '1.6';
+      });
+    });
   });
 
-  zoomOutBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    updateZoom(currentZoom - 10);
+  toggleBtn?.addEventListener('click', () => {
+    settingsBar?.classList.toggle('visible');
   });
 
   // Gestion des thèmes
@@ -252,11 +350,32 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     }
   });
 
-  fontSizeSlider?.addEventListener('input', (e) => {
-    const size = (e.target as HTMLInputElement).value;
-    if (contentArea) {
-      contentArea.style.fontSize = `${size}px`;
-      contentArea.style.lineHeight = '1.6';
+
+
+  // Gestion de la barre de progression
+  const progressBar = document.getElementById('reading-progress-bar');
+  const mobileSlider = document.getElementById('mobile-slider');
+  
+  // Scroll Desktop
+  window.addEventListener('scroll', () => {
+    if (window.innerWidth <= 768) return; // Ignorer sur mobile
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    
+    if (progressBar) {
+      progressBar.style.width = `${scrollPercent}%`;
+    }
+  });
+
+  // Scroll Mobile
+  mobileSlider?.addEventListener('scroll', () => {
+    const scrollLeft = mobileSlider.scrollLeft;
+    const scrollWidth = mobileSlider.scrollWidth - mobileSlider.clientWidth;
+    const scrollPercent = (scrollLeft / scrollWidth) * 100;
+    
+    if (progressBar) {
+      progressBar.style.width = `${scrollPercent}%`;
     }
   });
 </script>
@@ -288,74 +407,15 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     transform: scale(1.1);
   }
 
-  /* Styles du Zoom Flottant */
-  .zoom-widget {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem; /* Déplacé à droite */
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 0 0.5rem;
-    transition: all 0.3s ease;
-    height: 50px;
-    overflow: hidden;
-    width: auto;
-  }
-
-  .zoom-btn {
-    width: 0;
-    opacity: 0;
-    padding: 0;
-    border: none;
-    background: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .zoom-widget:hover .zoom-btn {
-    width: 30px;
-    opacity: 1;
-  }
-
-  .zoom-btn:hover {
-    color: var(--accent-color);
-    background: rgba(0,0,0,0.05);
-    border-radius: 50%;
-  }
-
-  .zoom-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0 1rem;
-    font-weight: bold;
-    cursor: default;
-    white-space: nowrap;
-    font-family: sans-serif;
-    color: #333;
-  }
-
-  .zoom-icon { font-size: 1.1rem; }
+  /* Styles du Zoom Flottant (Supprimé) */
+  /* .zoom-widget { ... } */
 
   .settings-bar {
     position: fixed;
     bottom: 10rem;
     right: 2rem;
     width: 320px;
-    max-height: 60vh;
-    overflow-y: auto;
     background: white;
-    padding: 1.5rem;
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     transform: translateY(20px);
@@ -365,7 +425,8 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     z-index: 99;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    overflow: hidden;
+    padding: 0;
   }
 
   .settings-bar.visible {
@@ -374,20 +435,112 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     pointer-events: auto;
   }
 
-  .setting-group {
-    width: 100%;
-    max-width: 400px;
+  /* Onglets */
+  .settings-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
   }
 
-  .setting-group label {
+  .tab-btn {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--accent-color);
+  }
+
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+  }
+
+  .tab-content {
+    display: none;
+    padding: 1.5rem;
+  }
+
+  .tab-content.active {
     display: block;
-    margin-bottom: 1rem;
+  }
+
+  /* Lignes de paramètres */
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .setting-row:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Boutons de police */
+  .font-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #333;
+    transition: all 0.2s;
+  }
+
+  .font-btn.active {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(140, 94, 88, 0.05);
+    box-shadow: 0 0 0 2px rgba(140, 94, 88, 0.2);
+  }
+
+  /* Contrôles Taille & Espacement */
+  .control-btn {
+    flex: 1;
+    height: 48px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
     font-weight: bold;
     color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .control-btn:hover {
+    background: #f5f5f5;
+  }
+
+  .control-btn.active {
+    background: #eee;
+    border-color: #ccc;
+  }
+
+  #font-size-display {
+    font-weight: bold;
+    min-width: 60px;
     text-align: center;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   .theme-selector {
@@ -441,25 +594,6 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
   .theme-btn.theme-sepia { background: #f4ecd8; color: #5b4636; border-color: #e3dcc8; }
   .theme-btn.theme-dark { background: #1a1a1a; color: #e0e0e0; border-color: #333; }
 
-  .range-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0 1rem;
-  }
-
-  .range-wrapper input {
-    flex: 1;
-    accent-color: var(--accent-color);
-    cursor: pointer;
-    height: 6px;
-    background: #eee;
-    border-radius: 3px;
-  }
-
-  .small-a { font-size: 0.8rem; }
-  .big-a { font-size: 1.5rem; }
-
   .document-container {
     font-family: Helvetica;
     max-width: 1000px;
@@ -467,20 +601,68 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     padding: 2rem 0;
   }
 
+  /* Mobile View Styles */
+  .mobile-view {
+    display: none;
+  }
+
   @media (max-width: 768px) {
-    .document-container {
-      padding: 1rem 0;
-      max-width: 100%;
-    }
-    
-    .page-container {
-      padding: 1.5rem !important;
+    .desktop-view {
+      display: none;
     }
 
-    .document-title {
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
+    .mobile-view {
+      display: block;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
     }
+
+    .mobile-slider {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      height: 100%;
+      width: 100%;
+      /* Hide scrollbar */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .mobile-slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-page {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      overflow-y: auto;
+      padding: 4rem 1.5rem 6rem 1.5rem; /* Espace pour header/footer */
+      box-sizing: border-box;
+      height: 100%;
+      position: relative;
+    }
+
+    .mobile-page-number {
+      position: absolute;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+
+    /* Ajustements UI Mobile */
+    .settings-toggle {
+      bottom: 8rem;
+    }
+    
+    /* .zoom-widget { ... } Supprimé */
   }
 
   .dyslexia {
@@ -526,5 +708,25 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     background: #e0e0e0;
     margin-top: 3rem;
     display: none; /* Caché car on a des boites séparées */
+  }
+
+  /* Barre de progression */
+  .reading-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(0,0,0,0.05);
+    z-index: 200;
+  }
+
+  .reading-progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    transition: width 0.1s;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
   }
 </style>
