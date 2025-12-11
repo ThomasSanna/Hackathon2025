@@ -37,6 +37,13 @@ const docList = Array.from(documents).map(id => ({
 	<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
 		<h1 style="text-align: center; margin-bottom: 2rem; color: #8c5e58;">Bibliothèque</h1>
 		
+		<div style="margin-bottom: 2rem; text-align: center; background: #f9f7f1; padding: 1rem; border-radius: 8px;">
+			<label style="display: inline-flex; align-items: center; cursor: pointer; user-select: none; color: #333;">
+				<input type="checkbox" id="dyslexia-toggle" style="margin-right: 0.5rem; width: 1.2rem; height: 1.2rem; accent-color: #8c5e58;">
+				<span style="font-size: 1.1rem; font-weight: 600;">Activer le mode Dyslexie</span>
+			</label>
+		</div>
+
 		<div class="grid">
 			{docList.map(doc => (
 				<a href={`/reader/${doc.id}`} class="card">
@@ -51,6 +58,24 @@ const docList = Array.from(documents).map(id => ({
     )}
 	</div>
 </Layout>
+
+<script>
+	const toggle = document.getElementById('dyslexia-toggle') as HTMLInputElement;
+	const links = document.querySelectorAll('.card');
+
+	toggle?.addEventListener('change', (e) => {
+		const isChecked = (e.target as HTMLInputElement).checked;
+		links.forEach(link => {
+			const url = new URL((link as HTMLAnchorElement).href);
+			if (isChecked) {
+				url.searchParams.set('dyslexia', 'true');
+			} else {
+				url.searchParams.delete('dyslexia');
+			}
+			(link as HTMLAnchorElement).href = url.toString();
+		});
+	});
+</script>
 
 <style>
 	.grid {

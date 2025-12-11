@@ -1,6 +1,8 @@
 ---
 import ReaderLayout from '../../layouts/ReaderLayout.astro';
 import type { MarkdownInstance } from 'astro';
+import fs from 'node:fs';
+import { marked } from 'marked';
 
 interface Frontmatter {
   document_title?: string;
@@ -56,45 +58,454 @@ interface Props {
 
 const { pages, docId } = Astro.props;
 const title = pages[0]?.frontmatter?.document_title || docId;
+
+// Fusion du contenu
+let fullMarkdown = "";
+
+pages.forEach((page, index) => {
+  try {
+    // Lecture du fichier brut
+    const content = fs.readFileSync(page.file, 'utf-8');
+    
+    // Suppression du frontmatter (entre les deux premiers ---)
+    // On cherche la fin du frontmatter
+    const parts = content.split('---');
+    let rawBody = "";
+    if (parts.length >= 3) {
+      // Le contenu est tout ce qui suit le 2ème ---
+      rawBody = parts.slice(2).join('---').trim();
+    } else {
+      rawBody = content; // Pas de frontmatter ?
+    }
+
+    // Gestion de la fusion avec la page précédente
+    if (fullMarkdown.length > 0) {
+      // Vérifie si la fin du texte précédent est un tiret (césure)
+      if (fullMarkdown.trim().endsWith('-')) {
+        // On supprime le tiret final et on colle le nouveau texte
+        fullMarkdown = fullMarkdown.trim().slice(0, -1) + rawBody;
+      } else {
+        // Sinon on ajoute un espace/saut de ligne standard
+        fullMarkdown += "\n\n" + rawBody;
+      }
+    } else {
+      fullMarkdown = rawBody;
+    }
+  } catch (e) {
+    console.error(`Erreur lecture fichier ${page.file}`, e);
+  }
+});
+
+// Correction des chemins d'images
+// Remplace "images/nom_image.jpg" par "/images/DOC_ID/nom_image.jpg"
+fullMarkdown = fullMarkdown.replace(/\]\(images\//g, `](/images/${docId}/`);
+fullMarkdown = fullMarkdown.replace(/src="images\//g, `src="/images/${docId}/`);
+
+// Conversion en HTML
+const contentHtml = marked.parse(fullMarkdown, { breaks: true });
 ---
 
 <ReaderLayout frontmatter={{ title: title }}>
-  <div class="document-container">
+  <div class="document-container" id="doc-container">
     <h1 class="document-title">{title}</h1>
     
     <div class="pages-list">
-      {pages.map((Page) => (
-        <div class="page-container" id={`page-${Page.frontmatter.page_number}`}>
-          <div class="page-header">Page {Page.frontmatter.page_number}</div>
-          <div class="page-content">
-            <Page.Content />
-          </div>
-          <hr class="page-separator" />
-        </div>
-      ))}
+      <div class="page-container">
+        <div class="page-content" id="content-area" set:html={contentHtml} />
+      </div>
     </div>
+  </div>
+
+  <!-- Barre d'outils flottante -->
+  <button id="settings-toggle" class="settings-toggle" title="Paramètres d'affichage">
+    Aa
+  </button>
+
+  <div id="settings-bar" class="settings-bar">
+    <div class="setting-group" style="margin-bottom: 1.5rem;">
+      <label>Thème</label>
+      <div class="theme-selector">
+        <button class="theme-btn theme-light" data-theme="theme-light" title="Clair">A</button>
+        <button class="theme-btn theme-sepia" data-theme="theme-sepia" title="Sépia">A</button>
+        <button class="theme-btn theme-dark" data-theme="theme-dark" title="Sombre">A</button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <label for="font-size-slider">Taille du texte</label>
+      <div class="range-wrapper">
+        <span class="small-a">A</span>
+        <input type="range" id="font-size-slider" min="14" max="32" value="16" step="1">
+        <span class="big-a">A</span>
+      </div>
+    </div>
+
+    <div class="setting-group" style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
+      <label style="display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <input type="checkbox" id="dyslexia-toggle-reader" style="margin-right: 0.5rem; width: 1.2rem; height: 1.2rem; accent-color: var(--accent-color);">
+        <span>Mode Dyslexie (OpenDyslexic)</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Contrôle de Zoom Flottant -->
+  <div class="zoom-widget">
+    <button id="zoom-out" class="zoom-btn" title="Réduire">-</button>
+    <div class="zoom-info">
+      <span class="zoom-icon">🔍</span>
+      <span id="zoom-value-display">100%</span>
+    </div>
+    <button id="zoom-in" class="zoom-btn" title="Agrandir">+</button>
   </div>
 </ReaderLayout>
 
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const docContainer = document.getElementById('doc-container');
+  const dyslexiaToggle = document.getElementById('dyslexia-toggle-reader') as HTMLInputElement;
+
+  // Initialisation du mode dyslexie via URL
+  if (params.get('dyslexia') === 'true') {
+    docContainer?.classList.add('dyslexia');
+    if (dyslexiaToggle) dyslexiaToggle.checked = true;
+  }
+
+  // Gestion du toggle dyslexie dans la barre
+  dyslexiaToggle?.addEventListener('change', (e) => {
+    if ((e.target as HTMLInputElement).checked) {
+      docContainer?.classList.add('dyslexia');
+    } else {
+      docContainer?.classList.remove('dyslexia');
+    }
+  });
+
+  // Gestion de la barre de paramètres
+  const toggleBtn = document.getElementById('settings-toggle');
+  const settingsBar = document.getElementById('settings-bar');
+  const fontSizeSlider = document.getElementById('font-size-slider');
+  const contentArea = document.getElementById('content-area');
+  const pagesList = document.querySelector('.pages-list') as HTMLElement;
+  const themeBtns = document.querySelectorAll('.theme-btn');
+
+  toggleBtn?.addEventListener('click', () => {
+    settingsBar?.classList.toggle('visible');
+  });
+
+  // Gestion du Zoom Flottant
+  const zoomInBtn = document.getElementById('zoom-in');
+  const zoomOutBtn = document.getElementById('zoom-out');
+  const zoomValueDisplay = document.getElementById('zoom-value-display');
+  
+  let currentZoom = 100;
+
+  function updateZoom(newZoom: number) {
+    currentZoom = Math.max(50, Math.min(200, newZoom)); // Limites 50% - 200%
+    
+    // Mise à jour affichage
+    if (zoomValueDisplay) zoomValueDisplay.textContent = `${currentZoom}%`;
+    
+    // Application du zoom
+    if (pagesList) {
+      const scale = currentZoom / 100;
+      // @ts-ignore
+      pagesList.style.zoom = scale;
+      
+      // Fallback Firefox
+      if (getComputedStyle(pagesList).zoom === '1' && scale !== 1) {
+        pagesList.style.transform = `scale(${scale})`;
+        pagesList.style.transformOrigin = 'top center';
+      }
+    }
+  }
+
+  zoomInBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateZoom(currentZoom + 10);
+  });
+
+  zoomOutBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateZoom(currentZoom - 10);
+  });
+
+  // Gestion des thèmes
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.getAttribute('data-theme');
+      // Retire toutes les classes de thème
+      document.documentElement.classList.remove('theme-light', 'theme-sepia', 'theme-dark');
+      // Ajoute la nouvelle si ce n'est pas le défaut (ou on peut tout gérer via classes)
+      if (theme) {
+        document.documentElement.classList.add(theme);
+      }
+      
+      // Mise à jour visuelle des boutons
+      themeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Fermer si on clique ailleurs
+  document.addEventListener('click', (e) => {
+    if (!settingsBar?.contains(e.target as Node) && !toggleBtn?.contains(e.target as Node)) {
+      settingsBar?.classList.remove('visible');
+    }
+  });
+
+  fontSizeSlider?.addEventListener('input', (e) => {
+    const size = (e.target as HTMLInputElement).value;
+    if (contentArea) {
+      contentArea.style.fontSize = `${size}px`;
+      contentArea.style.lineHeight = '1.6';
+    }
+  });
+</script>
+
 <style>
+  /* Styles de la barre d'outils */
+  .settings-toggle {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem; /* Déplacé à gauche */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    font-family: serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 100;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .settings-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  /* Styles du Zoom Flottant */
+  .zoom-widget {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem; /* Déplacé à droite */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 0 0.5rem;
+    transition: all 0.3s ease;
+    height: 50px;
+    overflow: hidden;
+    width: auto;
+  }
+
+  .zoom-btn {
+    width: 0;
+    opacity: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zoom-widget:hover .zoom-btn {
+    width: 30px;
+    opacity: 1;
+  }
+
+  .zoom-btn:hover {
+    color: var(--accent-color);
+    background: rgba(0,0,0,0.05);
+    border-radius: 50%;
+  }
+
+  .zoom-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    font-weight: bold;
+    cursor: default;
+    white-space: nowrap;
+    font-family: sans-serif;
+    color: #333;
+  }
+
+  .zoom-icon { font-size: 1.1rem; }
+
+  .settings-bar {
+    position: fixed;
+    bottom: 10rem;
+    right: 2rem;
+    width: 320px;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-bar.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .setting-group {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .setting-group label {
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .theme-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0.5rem;
+  }
+
+  .theme-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    cursor: pointer;
+    font-family: serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .theme-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .theme-btn.active {
+    border-color: var(--accent-color);
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(140, 94, 88, 0.3);
+  }
+
+  /* Indicateur visuel pour le thème actif */
+  .theme-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+  }
+
+  .theme-btn.theme-light { background: #ffffff; color: #333; }
+  .theme-btn.theme-sepia { background: #f4ecd8; color: #5b4636; border-color: #e3dcc8; }
+  .theme-btn.theme-dark { background: #1a1a1a; color: #e0e0e0; border-color: #333; }
+
+  .range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .range-wrapper input {
+    flex: 1;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+  }
+
+  .small-a { font-size: 0.8rem; }
+  .big-a { font-size: 1.5rem; }
+
   .document-container {
-    max-width: 800px;
+    font-family: Helvetica;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 2rem 0;
   }
-  
+
+  @media (max-width: 768px) {
+    .document-container {
+      padding: 1rem 0;
+      max-width: 100%;
+    }
+    
+    .page-container {
+      padding: 1.5rem !important;
+    }
+
+    .document-title {
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+  }
+
+  .dyslexia {
+    font-family: 'OpenDyslexic', sans-serif;
+  }
+
   .document-title {
     text-align: center;
     margin-bottom: 3rem;
     color: var(--accent-color);
   }
 
-  .page-container {
-    margin-bottom: 4rem;
-    background: white;
-    padding: 3rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  .pages-list {
     border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .page-container {
+    margin-bottom: 0;
+    padding: 3rem;
+    border-bottom: 1px dashed rgba(0,0,0,0.1); /* Séparateur discret pour marquer la fin de page */
+  }
+
+  .page-container:last-child {
+    border-bottom: none;
   }
 
   .page-header {
@@ -105,6 +516,10 @@ const title = pages[0]?.frontmatter?.document_title || docId;
     text-align: right;
   }
 
+  .page-content {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
   .page-separator {
     border: 0;
     height: 1px;
