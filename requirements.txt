@@ -2,5 +2,4 @@ PyPDF2
 mistralai
 python-dotenv
 pydantic
-
 jupyter
