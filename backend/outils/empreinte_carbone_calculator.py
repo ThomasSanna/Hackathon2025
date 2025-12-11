@@ -1,18 +1,16 @@
 from codecarbon import EmissionsTracker
 
-tracker = EmissionsTracker()
+def initialize_tracker():
+    tracker = EmissionsTracker(
+        project_name="semantic_analysis",
+        output_dir="outils/fichiers",
+        log_level="error"
+    )
+    return tracker
 
-def start_calculation():
+def start_calculation(tracker):
     tracker.start()
     
-def stop_calculation():
+def stop_calculation(tracker):
     emissions = tracker.stop()
     return emissions
-
-start_calculation()
-
-def calcul_lourd():
-    total = 0
-    for i in range(10**7):
-        total += i ** 2
-    return total

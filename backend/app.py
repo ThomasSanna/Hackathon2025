@@ -7,9 +7,18 @@ import uuid
 import os
 from pathlib import Path
 from datetime import datetime
+import logging
 from outils.commandes_vocales import VoiceCommandAgent, CommandResponse, create_default_config
 from outils.ocr_processor import OCRProcessor
 from outils.statistique_lecture import analyser_texte_lu
+from outils.analyse_semantique import SemanticAnalyzer
+
+# Configuration du logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -27,6 +36,9 @@ voice_agent = VoiceCommandAgent()
 
 # Initialiser le processeur OCR
 ocr_processor = OCRProcessor()
+
+# Initialiser l'analyseur sémantique
+semantic_analyzer = SemanticAnalyzer(chroma_db_path="./chromadb_data")
 
 # Dossier de sortie pour les fichiers OCR
 OUTPUT_DIR = Path("./output_ocr")
@@ -76,20 +88,23 @@ async def process_pdf_ocr(
     file: UploadFile = File(...),
     use_bbox_annotation: bool = True,
     use_document_annotation: bool = True,
-    max_pages: int = 32
+    max_pages: int = 32,
+    generate_analysis: bool = True
 ):
     """
     Traite un fichier PDF avec l'API Mistral OCR et génère un markdown par page.
     Traite jusqu'à 32 pages par blocs de 8 pages pour contourner la limite API.
+    Génère optionnellement un résumé et une carte mentale avec analyse sémantique.
     
     Args:
         file: Fichier PDF à traiter
         use_bbox_annotation: Activer l'annotation des images/graphiques
         use_document_annotation: Activer l'annotation du document (appliqué aux 8 premières pages)
         max_pages: Nombre maximum de pages à traiter (limite: 32 pages = 4 blocs de 8)
+        generate_analysis: Générer le résumé et la carte mentale (défaut: True)
         
     Returns:
-        JSON avec les chemins des fichiers générés et les métadonnées
+        JSON avec les chemins des fichiers générés, les métadonnées, le résumé et la mindmap
     """
     # Vérifier le type de fichier
     if not file.filename.lower().endswith('.pdf'):
@@ -112,7 +127,7 @@ async def process_pdf_ocr(
             max_pages=max_pages
         )
         
-        return JSONResponse(content={
+        response_data = {
             "success": True,
             "message": f"PDF traité avec succès: {result['total_pages']} pages, {result['total_images']} images",
             "data": {
@@ -123,7 +138,45 @@ async def process_pdf_ocr(
                 "total_images": result["total_images"],
                 "document_annotation": result["metadata"].get("document_annotation")
             }
-        })
+        }
+        
+        # Générer l'analyse sémantique si demandé
+        if generate_analysis and result['markdown_files']:
+            logger.info("🧠 Démarrage de l'analyse sémantique...")
+            try:
+                # Créer un ID unique pour le document
+                document_id = Path(result["output_dir"]).name
+                logger.info(f"Document ID: {document_id}")
+                logger.info(f"Nombre de fichiers markdown: {len(result['markdown_files'])}")
+                
+                # Analyser le document
+                logger.info("Appel à semantic_analyzer.analyze_document()...")
+                analysis_result = await semantic_analyzer.analyze_document(
+                    markdown_files=result['markdown_files'],
+                    document_id=document_id,
+                    output_dir=Path(result["output_dir"])
+                )
+                
+                logger.info("✓ Analyse sémantique terminée avec succès")
+                
+                # Ajouter les résultats d'analyse à la réponse
+                response_data["data"]["analysis"] = {
+                    "summary": analysis_result["summary"],
+                    "mindmap": analysis_result["mindmap"],
+                    "metrics": analysis_result["metrics"],
+                    "files": analysis_result["files"]
+                }
+                response_data["message"] += f" | Analyse sémantique générée avec {analysis_result['metrics']['n_clusters']} clusters"
+                
+            except Exception as analysis_error:
+                # Ne pas échouer complètement si l'analyse échoue
+                logger.error(f"❌ Erreur lors de l'analyse sémantique: {str(analysis_error)}")
+                logger.exception("Traceback complet de l'erreur d'analyse:")
+                response_data["data"]["analysis_error"] = str(analysis_error)
+                response_data["message"] += " | Erreur lors de l'analyse sémantique"
+            finally:
+                logger.info(f"🌍 Empreinte carbone de l'analyse sémantique: {emissions} kg CO2eq")
+        return JSONResponse(content=response_data)
         
     except Exception as e:
         raise HTTPException(

@@ -15,6 +15,10 @@ from mistralai import Mistral
 from mistralai.models import OCRResponse
 from mistralai.extra import response_format_from_pydantic_model
 from dotenv import load_dotenv
+import logging
+
+# Configuration du logger
+logger = logging.getLogger(__name__)
 
 # Charger les variables d'environnement depuis la racine du projet
 # Remonter de 2 niveaux depuis backend/outils/ vers la racine
