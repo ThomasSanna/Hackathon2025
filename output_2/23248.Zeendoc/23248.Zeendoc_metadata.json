@@ -1,0 +1,42 @@
+{
+  "source_file": "ressources/23248.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 2,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Rapport d'Activité de l'ORSTOM\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Le rapport d'activité de l'ORSTOM (Institut Français de Recherche Scientifique pour le Développement en Coopération) pour l'année 1985 décrit les efforts de renouvellement et de modernisation de l'institut. Il met en lumière les progrès réalisés dans divers départements de recherche, les collaborations internationales, et les défis rencontrés. Le rapport souligne également l'importance de la recherche fondamentale pour l'action et le développement, en particulier dans les régions tropicales. Les activités de l'ORSTOM sont présentées comme une contribution significative à la compréhension et à la gestion des défis climatiques et de développement.\",\n  \"key_points\": [\n    \"Efforts de renouvellement et de modernisation de l'ORSTOM en 1985.\",\n    \"Installation dans de nouveaux locaux et obtention de crédits pour la construction de laboratoires.\",\n    \"Collaborations internationales et redéploiement géographique et thématique.\",\n    \"Focus sur la recherche fondamentale pour l'action et le développement.\",\n    \"Importance de la zone intertropicale et des défis climatiques.\",\n    \"Participation aux programmes de recherche internationaux et collaborations avec divers pays.\",\n    \"Développement de programmes de recherche prioritaires et structuration des départements.\",\n    \"Contribution à la compréhension des phénomènes climatiques et à la gestion des ressources naturelles.\"\n  ],\n  \"authors\": [\n    \"Pierre LAVAU\",\n    \"Alain RUELLAN\"\n  ],\n  \"date\": \"1985\",\n  \"organizations\": [\n    \"ORSTOM\",\n    \"Institut Français de Recherche Scientifique pour le Développement en Coopération\"\n  ]\n}",
+  "markdown_files": [
+    "page_1.md",
+    "page_2.md",
+    "page_3.md",
+    "page_4.md",
+    "page_5.md",
+    "page_6.md",
+    "page_7.md",
+    "page_8.md"
+  ],
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 1406,
+        "top_left_y": 749,
+        "bottom_right_x": 1597,
+        "bottom_right_y": 954
+      },
+      "annotation": "{\n  \"image_type\": \"image\",\n  \"title\": \"Deux cercles gris\",\n  \"short_description\": \"Image de deux cercles gris sur un fond blanc\",\n  \"detailed_description\": \"L'image montre deux cercles gris superposés sur un fond blanc. Les cercles sont de taille similaire et sont placés l'un à côté de l'autre, légèrement espacés.\",\n  \"data_extracted\": \"\"\n}"
+    },
+    {
+      "id": "img-1.jpeg",
+      "filename": "page5_img1.jpg",
+      "page": 5,
+      "position": {
+        "top_left_x": 814,
+        "top_left_y": 1436,
+        "bottom_right_x": 1640,
+        "bottom_right_y": 1941
+      },
+      "annotation": "{\n  \"image_type\": \"image\",\n  \"title\": \"Image de Nuages\",\n  \"short_description\": \"Une image en noir et blanc montrant des nuages dans le ciel.\",\n  \"detailed_description\": \"L'image représente une vue en noir et blanc de nuages dans le ciel. Les nuages apparaissent sous forme de masses blanches et grises, avec des variations de texture et de densité. L'arrière-plan est plus sombre, ce qui permet de distinguer clairement les nuages. L'image semble avoir été prise depuis une certaine altitude, offrant une vue d'ensemble des formations nuageuses.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

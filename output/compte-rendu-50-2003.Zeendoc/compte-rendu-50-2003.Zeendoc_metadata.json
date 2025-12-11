@@ -1,0 +1,20 @@
+{
+  "source_file": "ressources/compte-rendu-50-2003.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 1,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Compte rendu 50\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Le document est un rapport annuel de la Commission Internationale de Numismatique (CIN) pour l'année 2003. Il inclut des informations sur la composition du bureau, les statuts et la constitution de la CIN, des hommages à des numismates notables, des détails sur des collections numismatiques historiques, une nécrologie, des comptes rendus de réunions, des informations financières, et une liste des membres de la commission. Le rapport est publié par le Secrétariat de la Commission et inclut des détails de contact pour les membres du bureau.\",\n  \"key_points\": [\n    \"Composition du Bureau de la CIN.\",\n    \"Statuts et Constitution de la CIN.\",\n    \"Hommages à des numismates notables : Karl Pink et Ivan G. Spassky.\",\n    \"Histoire des collections numismatiques et des institutions vouées à la numismatique.\",\n    \"Nécrologie de Laura Breglia.\",\n    \"Comptes rendus des réunions du Bureau et de l'Assemblée générale.\",\n    \"Comptes de la Commission.\",\n    \"Liste des membres de la Commission.\",\n    \"Informations financières et de dissolution.\"\n  ],\n  \"authors\": [],\n  \"date\": \"2003\",\n  \"organizations\": [\n    \"Commission Internationale de Numismatique (CIN)\",\n    \"Comité International des Sciences Historiques\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page2_img1.jpg",
+      "page": 2,
+      "position": {
+        "top_left_x": 400,
+        "top_left_y": 355,
+        "bottom_right_x": 788,
+        "bottom_right_y": 732
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Logo du New York Times\",\n  \"short_description\": \"Logo du New York Times avec une représentation stylisée de la Terre.\",\n  \"detailed_description\": \"Le logo du New York Times présente les initiales 'NYT' en gras, avec un 'N' et un 'Y' stylisés à l'intérieur d'un cercle. À côté du 'Y', il y a une représentation stylisée de la Terre, symbolisant l'ampleur mondiale de l'influence et du contenu du journal.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

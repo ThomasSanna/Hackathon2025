@@ -1,0 +1,20 @@
+{
+  "source_file": "ressources/CAT_C_SR.229-FR.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 1,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Convention contre la torture et autres peines ou traitements cruels, inhumains ou dégradants\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Le document est un compte rendu analytique de la première partie (publique) de la 229ème séance du Comité contre la torture des Nations Unies, tenue à Genève le 14 novembre 1995. La séance a examiné le deuxième rapport périodique du Danemark. Les points clés incluent la présentation par M. Reimann de divers documents sur le système judiciaire et les droits de l'homme au Danemark, des discussions sur l'incorporation des instruments internationaux dans la législation danoise, et des questions sur des cas spécifiques de torture et de traitement inhumain. Le Danemark a souligné ses efforts pour se conformer à la Convention et a fourni des informations sur les procédures judiciaires et les mesures disciplinaires contre les agents de police coupables de violence.\",\n  \"key_points\": [\n    \"Examen du deuxième rapport périodique du Danemark par le Comité contre la torture.\",\n    \"Présentation de documents sur le système judiciaire et les droits de l'homme au Danemark par M. Reimann.\",\n    \"Discussion sur l'incorporation des instruments internationaux dans la législation danoise.\",\n    \"Questions sur des cas spécifiques de torture et de traitement inhumain.\",\n    \"Efforts du Danemark pour se conformer à la Convention contre la torture.\",\n    \"Informations sur les procédures judiciaires et les mesures disciplinaires contre les agents de police coupables de violence.\"\n  ],\n  \"authors\": [\n    \"M. Reimann\",\n    \"M. Mikaelsen\",\n    \"M. Hendriksen\",\n    \"Mme Cohn\",\n    \"Mme Schouenborg\",\n    \"M. Frederiksen\"\n  ],\n  \"date\": \"14 novembre 1995\",\n  \"organizations\": [\n    \"Nations Unies\",\n    \"Comité contre la torture\",\n    \"Danemark\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 193,
+        "top_left_y": 311,
+        "bottom_right_x": 370,
+        "bottom_right_y": 472
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Logo des Nations Unies\",\n  \"short_description\": \"Logo des Nations Unies avec une carte du monde et des branches d'olivier\",\n  \"detailed_description\": \"Le logo des Nations Unies est composé d'une carte du monde stylisée en bleu, entourée de branches d'olivier. La carte représente les continents et les océans, symbolisant l'unité et la coopération mondiale. Les branches d'olivier représentent la paix et la sécurité internationales.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

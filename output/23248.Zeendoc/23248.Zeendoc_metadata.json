@@ -1,0 +1,32 @@
+{
+  "source_file": "ressources/23248.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 2,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Rapport d'Activité de l'ORSTOM\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Le rapport d'activité de l'ORSTOM (Institut Français de Recherche Scientifique pour le Développement en Coopération) pour l'année 1985 présente les efforts de renouvellement et de modernisation de l'institut. Il met en lumière les progrès réalisés dans divers départements de recherche, notamment en climatologie, en santé, et en développement. Le rapport souligne également les défis et les succès dans la coopération internationale, notamment en Afrique, en Asie, et en Amérique latine. Les activités de recherche sont axées sur des thèmes tels que les changements climatiques, la sécurité alimentaire, et les ressources naturelles. Le rapport inclut également des informations sur les moyens humains et financiers de l'institut.\",\n  \"key_points\": [\n    \"Efforts de renouvellement et de modernisation de l'ORSTOM en 1985.\",\n    \"Progrès réalisés dans divers départements de recherche.\",\n    \"Coopération internationale en Afrique, en Asie, et en Amérique latine.\",\n    \"Recherche axée sur les changements climatiques, la sécurité alimentaire, et les ressources naturelles.\",\n    \"Informations sur les moyens humains et financiers de l'institut.\"\n  ],\n  \"authors\": [\n    \"Pierre LAVAU\",\n    \"Alain RUELLAN\"\n  ],\n  \"date\": \"1985\",\n  \"organizations\": [\n    \"ORSTOM\",\n    \"Institut Français de Recherche Scientifique pour le Développement en Coopération\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 1406,
+        "top_left_y": 749,
+        "bottom_right_x": 1597,
+        "bottom_right_y": 954
+      },
+      "annotation": "{\n  \"image_type\": \"image\",\n  \"title\": \"Image avec des cercles\",\n  \"short_description\": \"Image montrant deux cercles gris sur un fond blanc\",\n  \"detailed_description\": \"L'image présente deux cercles gris superposés sur un fond blanc. Les cercles sont de taille similaire et sont placés de manière à se chevaucher partiellement. L'image semble être une partie d'une image plus grande, car elle est coupée sur les bords.\",\n  \"data_extracted\": \"\"\n}"
+    },
+    {
+      "id": "img-1.jpeg",
+      "filename": "page5_img1.jpg",
+      "page": 5,
+      "position": {
+        "top_left_x": 814,
+        "top_left_y": 1436,
+        "bottom_right_x": 1640,
+        "bottom_right_y": 1941
+      },
+      "annotation": "{\n  \"image_type\": \"image\",\n  \"title\": \"Image de Nuages\",\n  \"short_description\": \"Une image en noir et blanc de nuages dans le ciel.\",\n  \"detailed_description\": \"L'image montre une vue en noir et blanc de nuages dans le ciel. Les nuages apparaissent sous forme de masses blanches et grises, avec des zones plus sombres et plus claires indiquant différentes densités et épaisseurs des nuages. L'image semble avoir été prise depuis une certaine altitude, offrant une vue d'ensemble des formations nuageuses.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}
