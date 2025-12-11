@@ -2,5 +2,11 @@ PyPDF2
 mistralai
 python-dotenv
 pydantic
-
+chromadb
 jupyter
+scikit-learn
+numpy
+langchain
+langchain-text-splitters
+pydantic-ai
+matplotlib
