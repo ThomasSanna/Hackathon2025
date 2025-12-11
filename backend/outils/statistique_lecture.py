@@ -140,6 +140,5 @@ if __name__ == "__main__":
     texte_exemple = """
  Dans tous les cas, I'ordre de virement portait mention du nom de Monsieur Carlos L. MBERTON. Le montant des so¡nmes justÍfiées de Ia sorte s'éIève à 187 595 US $ dont la contre-valeur est proche de 975 000 F du troisième prêt consenti à t'lonsíeur Jacques CHEMINADE. Les fonds prêtés par Madame Ruth BIERRE à Monsieur -Jacques CHEMINADE proviendrãient donc d'avances et donateurs versés entre 1e 15 novembre 1991 et le 7 juin 1995
     """
-    
     stats = analyser_texte_lu(texte_exemple)
     afficher_statistiques(stats)
