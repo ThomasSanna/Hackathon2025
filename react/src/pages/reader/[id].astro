@@ -191,6 +191,18 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
         <button class="theme-btn theme-sepia" data-theme="theme-sepia" title="Sépia">A</button>
         <button class="theme-btn theme-dark" data-theme="theme-dark" title="Sombre">A</button>
       </div>
+
+      <!-- Daltonisme -->
+      <div class="daltonism-selector" style="margin-top: 15px; border-top: 1px solid var(--border-color, #eee); padding-top: 10px;">
+        <span style="font-size: 12px; opacity: 0.8; display: block; margin-bottom: 8px;">Daltonisme (Images)</span>
+        <select id="daltonism-select" style="width: 100%; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color, #ccc); background: var(--bg-color); color: var(--text-color);">
+            <option value="normal">Normal</option>
+            <option value="protanopia">Protanopie (Rouge)</option>
+            <option value="deuteranopia">Deutéranopie (Vert)</option>
+            <option value="tritanopia">Tritanopie (Bleu)</option>
+            <option value="monochromatism">Monochromatisme</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -201,6 +213,32 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
   <div class="reading-progress-container">
     <div id="reading-progress-bar" class="reading-progress-bar"></div>
   </div>
+
+  <!-- Filtres SVG pour Daltonisme -->
+  <svg style="width:0; height:0; position: absolute; visibility: hidden;">
+    <defs>
+        <filter id="protanopia">
+            <feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0
+                                                 0.558, 0.442, 0, 0, 0
+                                                 0, 0.242, 0.758, 0, 0
+                                                 0, 0, 0, 1, 0" />
+        </filter>
+        
+        <filter id="deuteranopia">
+            <feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0
+                                                 0.7, 0.3, 0, 0, 0
+                                                 0, 0.3, 0.7, 0, 0
+                                                 0, 0, 0, 1, 0" />
+        </filter>
+        
+        <filter id="tritanopia">
+            <feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0
+                                                 0, 0.433, 0.567, 0, 0
+                                                 0, 0.475, 0.525, 0, 0
+                                                 0, 0, 0, 1, 0" />
+        </filter>
+    </defs>
+  </svg>
 </ReaderLayout>
 
 <script>
@@ -341,6 +379,29 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
       themeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     });
+  });
+
+  // Gestion du Daltonisme
+  const daltonismSelect = document.getElementById('daltonism-select');
+  
+  function applyDaltonism(mode: string) {
+    document.body.classList.remove('daltonism-protanopia', 'daltonism-deuteranopia', 'daltonism-tritanopia', 'daltonism-monochromatism');
+    if (mode !== 'normal') {
+      document.body.classList.add(`daltonism-${mode}`);
+    }
+  }
+
+  // Charger la préférence
+  const savedDaltonism = localStorage.getItem('reader_daltonism') || 'normal';
+  if (daltonismSelect) {
+    (daltonismSelect as HTMLSelectElement).value = savedDaltonism;
+    applyDaltonism(savedDaltonism);
+  }
+
+  daltonismSelect?.addEventListener('change', (e) => {
+    const mode = (e.target as HTMLSelectElement).value;
+    applyDaltonism(mode);
+    localStorage.setItem('reader_daltonism', mode);
   });
 
   // Fermer si on clique ailleurs
@@ -729,4 +790,12 @@ const contentHtml = marked.parse(fullMarkdown, { breaks: true });
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
   }
+</style>
+
+<style is:global>
+  /* Filtres Daltonisme */
+  body.daltonism-protanopia img { filter: url('#protanopia'); }
+  body.daltonism-deuteranopia img { filter: url('#deuteranopia'); }
+  body.daltonism-tritanopia img { filter: url('#tritanopia'); }
+  body.daltonism-monochromatism img { filter: grayscale(100%); }
 </style>
