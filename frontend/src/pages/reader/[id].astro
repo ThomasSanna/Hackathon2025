@@ -37,6 +37,7 @@ import ChatBot from "@src/components/reader/ChatBot";
 import FloatingControls from "@src/components/reader/FloatingControls";
 import Karaoke from "@src/components/reader/Karaoke";
 import PomodoroTimer from "@src/components/reader/PomodoroTimer";
+import ImageDetails from "@src/components/reader/ImageDetails";
 
 // Configuration du processeur Markdown
 const processor = unified()
@@ -219,6 +220,9 @@ const pagesContentPromises = pages.map(async (page) => {
 
 const pagesContent = await Promise.all(pagesContentPromises);
 const currentFrontmatter = pages[0]?.frontmatter || {};
+
+// Collecter les métadonnées des images pour le tooltip
+const allImagesMetadata = pages.flatMap(p => p.frontmatter?.images || []).filter(img => img && img.filename);
 ---
 
 <ReaderLayout frontmatter={{ title: title }}>
@@ -240,6 +244,7 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
   <TextTransformations client:load />
   <WordDefinition client:load />
   <ProgressTracker client:only="react" docId={docId} />
+  <ImageDetails client:load />
   
   <FloatingControls client:load>
     <VoiceCommand client:load />
@@ -275,6 +280,61 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
     </div>
   </div>
 </ReaderLayout>
+
+<script define:vars={{ allImagesMetadata }}>
+  // Script pour ajouter les descriptions d'images (alt text) au survol
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('img');
+    
+    images.forEach(img => {
+      const src = img.getAttribute('src');
+      if (!src) return;
+      
+      // Extraire le nom de fichier de l'URL
+      const filename = src.split('/').pop();
+      if (!filename) return;
+
+      const decodedFilename = decodeURIComponent(filename);
+
+      // Trouver les métadonnées correspondantes
+      const meta = allImagesMetadata.find(m => {
+         if (!m.filename) return false;
+         // Comparaison flexible (nom exact ou fin du chemin)
+         return m.filename === decodedFilename || m.filename.endsWith(decodedFilename) || decodedFilename.endsWith(m.filename);
+      });
+      
+      if (meta) {
+        const text = meta.description || meta.detailed_description;
+        if (text) {
+          // L'attribut title affiche une info-bulle native au survol
+          img.setAttribute('title', text);
+          // On met aussi à jour le alt pour l'accessibilité si nécessaire
+          if (!img.getAttribute('alt') || img.getAttribute('alt') === filename) {
+             img.setAttribute('alt', text);
+          }
+
+          // Ajouter un curseur pointer pour indiquer que c'est cliquable
+          img.style.cursor = 'pointer';
+          
+          // Ajouter l'écouteur d'événement pour ouvrir la modale
+          img.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const event = new CustomEvent('open-image-details', {
+                detail: {
+                    src: src,
+                    alt: filename,
+                    description: text
+                }
+            });
+            window.dispatchEvent(event);
+          });
+        }
+      }
+    });
+  });
+</script>
 
 <script>
   const params = new URLSearchParams(window.location.search);
