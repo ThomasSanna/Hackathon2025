@@ -1,0 +1,73 @@
+<!-- Barre de progression de lecture -->
+<div class="reading-progress-container" id="progress-container">
+  <div id="reading-progress-bar" class="reading-progress-bar"></div>
+</div>
+
+<script>
+  import { usePersonnalisationStore } from "../stores/personnalisationStore";
+
+  const progressBar = document.getElementById("reading-progress-bar");
+  const progressContainer = document.getElementById("progress-container");
+  const mobileSlider = document.getElementById("mobile-slider");
+
+  // Fonction pour mettre à jour la visibilité
+  function updateVisibility() {
+    const state = usePersonnalisationStore.getState();
+    if (progressContainer) {
+      progressContainer.style.display = state.barre_progression
+        ? "block"
+        : "none";
+    }
+  }
+
+  // S'abonner aux changements du store
+  usePersonnalisationStore.subscribe(updateVisibility);
+
+  // Appliquer l'état initial
+  updateVisibility();
+
+  // Scroll Desktop
+  window.addEventListener("scroll", () => {
+    if (window.innerWidth <= 768) return; // Ignorer sur mobile
+    const scrollTop = window.scrollY;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+
+    if (progressBar) {
+      progressBar.style.width = `${scrollPercent}%`;
+    }
+  });
+
+  // Scroll Mobile
+  mobileSlider?.addEventListener("scroll", () => {
+    const scrollLeft = mobileSlider.scrollLeft;
+    const scrollWidth = mobileSlider.scrollWidth - mobileSlider.clientWidth;
+    const scrollPercent = (scrollLeft / scrollWidth) * 100;
+
+    if (progressBar) {
+      progressBar.style.width = `${scrollPercent}%`;
+    }
+  });
+</script>
+
+<style>
+  .reading-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    z-index: 200;
+  }
+
+  .reading-progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    transition: width 0.1s;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+</style>

@@ -1,0 +1,338 @@
+---
+
+---
+
+<aside id="toc-panel" class="toc-panel">
+  <div class="panel-header">
+    <h2>Sommaire</h2>
+    <button id="close-toc" class="close-btn">&times;</button>
+  </div>
+
+  <div class="panel-content">
+    <nav id="toc-nav" class="toc-nav">
+      <!-- Généré dynamiquement -->
+    </nav>
+  </div>
+</aside>
+
+<div id="toc-overlay" class="panel-overlay"></div>
+
+<style>
+  .toc-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%); /* Caché par défaut */
+    width: 300px;
+    height: 100vh;
+    background: var(--bg-color);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 200;
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .toc-panel.open {
+    transform: translateX(0);
+  }
+
+  .panel-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--accent-color);
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+  }
+
+  .panel-content {
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .panel-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Styles pour le sommaire généré */
+  :global(.toc-list) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  :global(.toc-item) {
+    margin-bottom: 0.2rem;
+  }
+
+  :global(.toc-link-wrapper) {
+    display: flex;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  :global(.toc-link-wrapper:hover) {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  :global(.toc-link-wrapper.active) {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--accent-color);
+    font-weight: 500;
+  }
+
+  :global(.toc-toggle) {
+    background: none;
+    border: none;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    color: #888;
+    transition: transform 0.2s;
+    font-size: 0.8rem;
+  }
+
+  :global(.toc-toggle.expanded) {
+    transform: rotate(90deg);
+  }
+
+  :global(.toc-toggle.hidden) {
+    visibility: hidden;
+  }
+
+  :global(.toc-link) {
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.95rem;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.toc-sublist) {
+    list-style: none;
+    padding-left: 1.2rem;
+    margin: 0;
+    display: none;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  :global(.toc-sublist.visible) {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .toc-panel {
+      width: 85%;
+    }
+  }
+</style>
+
+<script>
+  const tocPanel = document.getElementById("toc-panel");
+  const tocOverlay = document.getElementById("toc-overlay");
+  const closeBtn = document.getElementById("close-toc");
+  const toggleBtn = document.getElementById("toc-toggle"); // Dans la navbar
+  const tocNav = document.getElementById("toc-nav");
+  const contentArea = document.getElementById("content-area");
+
+  function toggleToc() {
+    tocPanel?.classList.toggle("open");
+    tocOverlay?.classList.toggle("active");
+  }
+
+  toggleBtn?.addEventListener("click", toggleToc);
+  closeBtn?.addEventListener("click", toggleToc);
+  tocOverlay?.addEventListener("click", toggleToc);
+
+  // Génération du sommaire
+  function generateTOC() {
+    if (!contentArea || !tocNav) return;
+
+    const headings = contentArea.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    if (headings.length === 0) {
+      tocNav.innerHTML =
+        '<p style="color:#888; text-align:center;">Aucun sommaire disponible</p>';
+      return;
+    }
+
+    const rootUl = document.createElement("ul");
+    rootUl.className = "toc-list";
+
+    // Stack pour garder la trace de la hiérarchie : [{level: 1, element: ul}, ...]
+    const stack = [{ level: 0, element: rootUl }];
+
+    headings.forEach((heading, index) => {
+      const level = parseInt(heading.tagName.substring(1));
+      const text = heading.textContent || "";
+      const id = heading.id || `heading-${index}`;
+
+      // Assurer que le heading a un ID pour le lien
+      if (!heading.id) heading.id = id;
+
+      // Créer l'élément de liste
+      const li = document.createElement("li");
+      li.className = "toc-item";
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "toc-link-wrapper";
+
+      const toggle = document.createElement("button");
+      toggle.className = "toc-toggle hidden"; // Caché par défaut, montré si enfants
+      toggle.innerHTML = "▶";
+      toggle.onclick = (e) => {
+        e.stopPropagation();
+        const sublist = li.querySelector(".toc-sublist");
+        if (sublist) {
+          sublist.classList.toggle("visible");
+          toggle.classList.toggle("expanded");
+        }
+      };
+
+      const link = document.createElement("a");
+      link.href = `#${id}`;
+      link.className = "toc-link";
+      link.textContent = text;
+      link.onclick = () => {
+        if (window.innerWidth < 768) toggleToc(); // Fermer sur mobile au clic
+
+        // Déplier si enfants
+        const sublist = li.querySelector(".toc-sublist");
+        if (sublist) {
+          sublist.classList.add("visible");
+          toggle.classList.add("expanded");
+        }
+      };
+
+      wrapper.appendChild(toggle);
+      wrapper.appendChild(link);
+      li.appendChild(wrapper);
+
+      // Logique d'imbrication
+      let parent = stack[stack.length - 1];
+
+      if (level > parent.level) {
+        // On descend d'un niveau (ou plus)
+        // Si on saute des niveaux (ex h1 -> h3), on crée des UL intermédiaires
+        // Pour simplifier, on attache au dernier LI du parent actuel
+        const lastLi = parent.element.lastElementChild as HTMLElement;
+        if (lastLi) {
+          const subUl = document.createElement("ul");
+          subUl.className = "toc-sublist";
+          lastLi.appendChild(subUl);
+
+          // Rendre le toggle visible sur le parent
+          const parentToggle = lastLi.querySelector(".toc-toggle");
+          if (parentToggle) parentToggle.classList.remove("hidden");
+
+          stack.push({ level: level, element: subUl });
+          subUl.appendChild(li);
+        } else {
+          // Cas rare: premier élément est un h2 par exemple, on le met à la racine
+          parent.element.appendChild(li);
+        }
+      } else if (level === parent.level) {
+        // Même niveau
+        parent.element.appendChild(li);
+      } else {
+        // On remonte
+        while (stack.length > 1 && stack[stack.length - 1].level > level) {
+          stack.pop();
+        }
+        // Si on n'a pas trouvé exactement le niveau, on prend le plus proche parent
+        // (ex: on est à h4, on remonte vers h2, on s'arrête au niveau h2)
+        // Si le niveau actuel est toujours plus grand que le stack top, c'est bizarre mais on append
+        if (stack[stack.length - 1].level < level) {
+          // Cas où on remonte de h4 à h3 mais le stack a h2 -> h4
+          // On devrait être bon avec le pop ci-dessus
+        }
+        stack[stack.length - 1].element.appendChild(li);
+      }
+    });
+
+    tocNav.appendChild(rootUl);
+  }
+
+  // Observer pour surligner le titre actif
+  function setupObserver() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            document
+              .querySelectorAll(".toc-link-wrapper")
+              .forEach((el) => el.classList.remove("active"));
+            const activeLink = document.querySelector(
+              `.toc-link[href="#${id}"]`
+            );
+            if (activeLink) {
+              activeLink.closest(".toc-link-wrapper")?.classList.add("active");
+              // Expand parents
+              let parent = activeLink.closest(".toc-sublist");
+              while (parent) {
+                parent.classList.add("visible");
+                const parentLi = parent.closest(".toc-item");
+                const toggle = parentLi?.querySelector(".toc-toggle");
+                if (toggle) toggle.classList.add("expanded");
+                parent = parentLi?.parentElement?.closest(".toc-sublist");
+              }
+            }
+          }
+        });
+      },
+      { rootMargin: "-100px 0px -60% 0px" }
+    );
+
+    document
+      .querySelectorAll("h1, h2, h3, h4, h5, h6")
+      .forEach((h) => observer.observe(h));
+  }
+
+  // Init
+  if (contentArea) {
+    // Attendre un peu que le DOM soit stable si besoin
+    setTimeout(() => {
+      generateTOC();
+      setupObserver();
+    }, 100);
+  }
+</script>

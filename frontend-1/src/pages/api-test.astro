@@ -1,0 +1,506 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <div class="api-test-container">
+    <h1 class="page-title">Test des API Backend</h1>
+    <p class="page-subtitle">
+      Testez tous les endpoints du backend FastAPI
+    </p>
+
+    <!-- Status du Backend -->
+    <div class="status-card">
+      <h2>État du Backend</h2>
+      <div id="backend-status" class="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Vérification en cours...</span>
+      </div>
+    </div>
+
+    <!-- Test Commande Vocale -->
+    <div class="test-card">
+      <h2>🎤 Commande Vocale</h2>
+      <div class="test-form">
+        <label for="voice-command">Commande:</label>
+        <input
+          type="text"
+          id="voice-command"
+          placeholder="Ex: augmente la taille de police de 2 points"
+          class="input-field"
+        />
+        <button id="test-voice-btn" class="test-btn">Tester</button>
+      </div>
+      <div id="voice-result" class="result-box"></div>
+    </div>
+
+    <!-- Test Analyse de Texte -->
+    <div class="test-card">
+      <h2>📊 Analyse de Texte</h2>
+      <div class="test-form">
+        <label for="text-analysis">Texte à analyser:</label>
+        <textarea
+          id="text-analysis"
+          rows="5"
+          placeholder="Entrez votre texte ici..."
+          class="input-field"
+        ></textarea>
+        <button id="test-stats-btn" class="test-btn">Analyser</button>
+      </div>
+      <div id="stats-result" class="result-box"></div>
+    </div>
+
+    <!-- Test Wikipedia -->
+    <div class="test-card">
+      <h2>📚 Recherche Wikipedia</h2>
+      <div class="test-form">
+        <label for="wiki-search">Nom/Sujet:</label>
+        <input
+          type="text"
+          id="wiki-search"
+          placeholder="Ex: Albert Einstein"
+          class="input-field"
+        />
+        <label for="wiki-lang">Langue:</label>
+        <select id="wiki-lang" class="input-field">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="de">Deutsch</option>
+        </select>
+        <button id="test-wiki-btn" class="test-btn">Rechercher</button>
+      </div>
+      <div id="wiki-result" class="result-box"></div>
+    </div>
+
+    <!-- Test OCR (simplifié) -->
+    <div class="test-card">
+      <h2>🔍 OCR PDF</h2>
+      <div class="test-form">
+        <label for="pdf-upload">Fichier PDF:</label>
+        <input
+          type="file"
+          id="pdf-upload"
+          accept=".pdf"
+          class="input-field"
+        />
+        <div class="options-group">
+          <label>
+            <input type="checkbox" id="use-bbox" checked />
+            Annotation des images
+          </label>
+          <label>
+            <input type="checkbox" id="use-doc" checked />
+            Annotation du document
+          </label>
+          <label>
+            <input type="checkbox" id="gen-analysis" checked />
+            Générer l'analyse
+          </label>
+        </div>
+        <label for="max-pages">Pages max:</label>
+        <input
+          type="number"
+          id="max-pages"
+          value="8"
+          min="1"
+          max="32"
+          class="input-field"
+        />
+        <button id="test-ocr-btn" class="test-btn">Traiter PDF</button>
+      </div>
+      <div id="ocr-result" class="result-box"></div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .api-test-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin: 0 0 2rem;
+    font-size: 1.1rem;
+  }
+
+  .status-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .status-card h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-dot.connected {
+    background: #22c55e;
+    animation: none;
+  }
+
+  .status-dot.disconnected {
+    background: var(--rouge-logo);
+    animation: none;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .status-text {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .test-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .test-card h2 {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .test-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .test-form label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .input-field {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--bleu-logo);
+  }
+
+  textarea.input-field {
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+  }
+
+  .options-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .options-group input[type="checkbox"] {
+    cursor: pointer;
+  }
+
+  .test-btn {
+    background: linear-gradient(135deg, var(--bleu-logo) 0%, #0000a0 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .test-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 100, 0.3);
+  }
+
+  .test-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .result-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-color);
+    min-height: 100px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .result-box.success {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.05);
+  }
+
+  .result-box.error {
+    border-color: var(--rouge-logo);
+    background: rgba(249, 69, 65, 0.05);
+    color: var(--rouge-logo);
+  }
+
+  .result-box.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .api-test-container {
+      padding: 1rem;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+    }
+
+    .test-card {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  import {
+    checkBackendHealth,
+    VoiceApi,
+    StatsApi,
+    WikipediaApi,
+    OCRApi,
+  } from "../utils/api";
+
+  // Éléments DOM
+  const backendStatus = document.getElementById("backend-status");
+  const statusDot = backendStatus?.querySelector(".status-dot");
+  const statusText = backendStatus?.querySelector(".status-text");
+
+  // Vérifier le backend au chargement
+  async function checkBackend() {
+    const isConnected = await checkBackendHealth();
+
+    if (statusDot && statusText) {
+      if (isConnected) {
+        statusDot.classList.add("connected");
+        statusText.textContent = "✓ Backend connecté (http://localhost:8000)";
+      } else {
+        statusDot.classList.add("disconnected");
+        statusText.textContent =
+          "✗ Backend non accessible - Démarrez le serveur FastAPI";
+      }
+    }
+  }
+
+  checkBackend();
+
+  // Test Commande Vocale
+  document
+    .getElementById("test-voice-btn")
+    ?.addEventListener("click", async () => {
+      const commandInput = document.getElementById(
+        "voice-command"
+      ) as HTMLInputElement;
+      const resultBox = document.getElementById("voice-result");
+
+      if (!commandInput || !resultBox) return;
+
+      const command = commandInput.value.trim();
+      if (!command) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = "Veuillez entrer une commande";
+        return;
+      }
+
+      resultBox.className = "result-box loading";
+      resultBox.textContent = "⏳ Traitement en cours...";
+
+      try {
+        const result = await VoiceApi.processCommand({ command });
+
+        resultBox.className = "result-box success";
+        resultBox.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = `❌ Erreur: ${error instanceof Error ? error.message : "Erreur inconnue"}`;
+      }
+    });
+
+  // Test Analyse de Texte
+  document
+    .getElementById("test-stats-btn")
+    ?.addEventListener("click", async () => {
+      const textInput = document.getElementById(
+        "text-analysis"
+      ) as HTMLTextAreaElement;
+      const resultBox = document.getElementById("stats-result");
+
+      if (!textInput || !resultBox) return;
+
+      const texte = textInput.value.trim();
+      if (!texte) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = "Veuillez entrer un texte à analyser";
+        return;
+      }
+
+      resultBox.className = "result-box loading";
+      resultBox.textContent = "⏳ Analyse en cours...";
+
+      try {
+        const result = await StatsApi.analyzeText(texte);
+
+        resultBox.className = "result-box success";
+        resultBox.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = `❌ Erreur: ${error instanceof Error ? error.message : "Erreur inconnue"}`;
+      }
+    });
+
+  // Test Wikipedia
+  document
+    .getElementById("test-wiki-btn")
+    ?.addEventListener("click", async () => {
+      const searchInput = document.getElementById(
+        "wiki-search"
+      ) as HTMLInputElement;
+      const langSelect = document.getElementById(
+        "wiki-lang"
+      ) as HTMLSelectElement;
+      const resultBox = document.getElementById("wiki-result");
+
+      if (!searchInput || !langSelect || !resultBox) return;
+
+      const nom = searchInput.value.trim();
+      const langue = langSelect.value;
+
+      if (!nom) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = "Veuillez entrer un nom/sujet";
+        return;
+      }
+
+      resultBox.className = "result-box loading";
+      resultBox.textContent = "⏳ Recherche en cours...";
+
+      try {
+        const result = await WikipediaApi.search({ nom, langue });
+
+        resultBox.className = "result-box success";
+        resultBox.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        resultBox.className = "result-box error";
+        resultBox.textContent = `❌ Erreur: ${error instanceof Error ? error.message : "Erreur inconnue"}`;
+      }
+    });
+
+  // Test OCR
+  document.getElementById("test-ocr-btn")?.addEventListener("click", async () => {
+    const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
+    const bboxCheckbox = document.getElementById("use-bbox") as HTMLInputElement;
+    const docCheckbox = document.getElementById("use-doc") as HTMLInputElement;
+    const analysisCheckbox = document.getElementById(
+      "gen-analysis"
+    ) as HTMLInputElement;
+    const maxPagesInput = document.getElementById(
+      "max-pages"
+    ) as HTMLInputElement;
+    const resultBox = document.getElementById("ocr-result");
+
+    if (!fileInput || !resultBox) return;
+
+    const file = fileInput.files?.[0];
+    if (!file) {
+      resultBox.className = "result-box error";
+      resultBox.textContent = "Veuillez sélectionner un fichier PDF";
+      return;
+    }
+
+    resultBox.className = "result-box loading";
+    resultBox.textContent = "⏳ Traitement OCR en cours (cela peut prendre quelques minutes)...";
+
+    try {
+      const result = await OCRApi.processPDF(file, {
+        use_bbox_annotation: bboxCheckbox?.checked ?? true,
+        use_document_annotation: docCheckbox?.checked ?? true,
+        max_pages: parseInt(maxPagesInput?.value ?? "8"),
+        generate_analysis: analysisCheckbox?.checked ?? true,
+      });
+
+      resultBox.className = "result-box success";
+      resultBox.textContent = JSON.stringify(result, null, 2);
+    } catch (error) {
+      resultBox.className = "result-box error";
+      resultBox.textContent = `❌ Erreur: ${error instanceof Error ? error.message : "Erreur inconnue"}`;
+    }
+  });
+</script>
+</Layout>

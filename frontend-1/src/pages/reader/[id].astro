@@ -1,0 +1,527 @@
+---
+import ReaderLayout from "../../layouts/ReaderLayout.astro";
+import type { MarkdownInstance } from "astro";
+import fs from "node:fs";
+import FiltreDaltonisme from "@src/components/filtre_daltonisme.astro";
+import BarreProgression from "@src/components/barre_progression.astro";
+
+// Unified Ecosystem
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkRehype from "remark-rehype";
+import rehypeKatex from "rehype-katex";
+import rehypeStringify from "rehype-stringify";
+import remarkBreaks from "remark-breaks";
+import rehypeSlug from "rehype-slug";
+import rehypeMermaid from "rehype-mermaid";
+
+// Components
+// Components
+import ReaderNavbar from "@src/components/reader/ReaderNavbar.astro";
+import InfoPanel from "@src/components/reader/InfoPanel";
+import TableOfContents from "@src/components/reader/TableOfContents.astro";
+
+// React Components pour l'accessibilité
+import ReaderStyleProvider from "@src/components/reader/ReaderStyleProvider";
+import RegleLecture from "@src/components/reader/RegleLecture";
+import FocusLigne from "@src/components/reader/FocusLigne";
+import FocusParagraphe from "@src/components/reader/FocusParagraphe";
+import ModeParagrapheParParagraphe from "@src/components/reader/ModeParagrapheParParagraphe";
+import TextTransformations from "@src/components/reader/TextTransformations";
+import WordDefinition from "@src/components/reader/WordDefinition";
+import ProgressTracker from "@src/components/reader/ProgressTracker";
+
+// Configuration du processeur Markdown
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm) // Tables, strikethrough, etc.
+  .use(remarkMath) // Math syntax ($...$)
+  .use(remarkBreaks) // Hard breaks (newlines become <br>)
+  .use(remarkRehype, { allowDangerousHtml: true }) // Convert to HTML AST
+  .use(rehypeKatex) // Render math with KaTeX
+  .use(rehypeMermaid, {
+    strategy: "inline-svg", // Génère du SVG inline
+    dark: false,
+    mermaidConfig: {
+      theme: "default",
+      securityLevel: "loose",
+    },
+  }) // Render Mermaid diagrams
+  .use(rehypeSlug) // Add IDs to headings
+  .use(rehypeStringify, { allowDangerousHtml: true }); // Stringify HTML
+
+async function parseMarkdown(content: string): Promise<string> {
+  const file = await processor.process(content);
+  return String(file);
+}
+
+export interface Frontmatter {
+  source_file?: string;
+  page_number?: number;
+  total_pages?: number;
+  total_images?: number;
+  document_title?: string;
+  language?: string;
+  document_type?: string;
+  summary?: string;
+  key_points?: string[];
+  authors?: string[];
+  date?: string;
+  organizations?: string[];
+  images?: ImageMetadata[];
+}
+
+export interface ImageMetadata {
+  id?: string;
+  filename?: string;
+  image_type?: string;
+  title?: string;
+  description?: string;
+  detailed_description?: string;
+}
+
+export async function getStaticPaths() {
+  // Récupère tous les fichiers markdown dans output_2
+  const allPages = await Astro.glob<Frontmatter>("../output_2/**/*.md");
+
+  // Regroupe les pages par dossier (ID du document)
+  const pagesByDoc: Record<string, MarkdownInstance<Frontmatter>[]> = {};
+
+  allPages.forEach((page) => {
+    // Le chemin du fichier est dans page.file
+    // Exemple: .../src/pages/output_2/23248.Zeendoc/page_1.md
+    // Gestion des séparateurs de chemin Windows/Unix
+    const parts = page.file.split(/[/\\]/);
+    // On suppose que la structure est .../output_2/[dossier]/[fichier]
+    // On cherche l'index de output_2 pour trouver le dossier suivant
+    const outputIndex = parts.indexOf("output_2");
+    if (outputIndex !== -1 && parts.length > outputIndex + 1) {
+      const docId = parts[outputIndex + 1];
+
+      if (!pagesByDoc[docId]) {
+        pagesByDoc[docId] = [];
+      }
+      pagesByDoc[docId].push(page);
+    }
+  });
+
+  // Crée les chemins pour chaque document
+  return Object.keys(pagesByDoc).map((docId) => {
+    // Trie les pages par numéro de page (supposant que le frontmatter a page_number ou le nom de fichier)
+    const sortedPages = pagesByDoc[docId].sort((a, b) => {
+      const pageA =
+        a.frontmatter.page_number ||
+        parseInt(a.file.match(/page_(\d+)/)?.[1] || "0");
+      const pageB =
+        b.frontmatter.page_number ||
+        parseInt(b.file.match(/page_(\d+)/)?.[1] || "0");
+      return pageA - pageB;
+    });
+
+    return {
+      params: { id: docId },
+      props: { pages: sortedPages, docId },
+    };
+  });
+}
+
+interface Props {
+  pages: MarkdownInstance<Frontmatter>[];
+  docId: string;
+}
+
+const { pages, docId } = Astro.props;
+const title = pages[0]?.frontmatter?.document_title || docId;
+
+// Fusion du contenu
+let fullMarkdown = "";
+
+pages.forEach((page, index) => {
+  try {
+    // Lecture du fichier brut
+    const content = fs.readFileSync(page.file, "utf-8");
+
+    // Suppression du frontmatter (entre les deux premiers ---)
+    // On cherche la fin du frontmatter
+    const parts = content.split("---");
+    let rawBody = "";
+    if (parts.length >= 3) {
+      // Le contenu est tout ce qui suit le 2ème ---
+      rawBody = parts.slice(2).join("---").trim();
+    } else {
+      rawBody = content; // Pas de frontmatter ?
+    }
+
+    // --- Logique pour la version Desktop (Fusionnée) ---
+    // Gestion de la fusion avec la page précédente
+    if (fullMarkdown.length > 0) {
+      // Vérifie si la fin du texte précédent est un tiret (césure)
+      if (fullMarkdown.trim().endsWith("-")) {
+        // On supprime le tiret final et on colle le nouveau texte
+        fullMarkdown = fullMarkdown.trim().slice(0, -1) + rawBody;
+      } else {
+        // Sinon on ajoute un espace/saut de ligne standard
+        fullMarkdown += "\n\n" + rawBody;
+      }
+    } else {
+      fullMarkdown = rawBody;
+    }
+  } catch (e) {
+    console.error(`Erreur lecture fichier ${page.file}`, e);
+  }
+});
+
+// Remplace "images/nom_image.jpg" par "/images/DOC_ID/nom_image.jpg"
+fullMarkdown = fullMarkdown.replace(/\]\(images\//g, `](/images/${docId}/`);
+fullMarkdown = fullMarkdown.replace(/src="images\//g, `src="/images/${docId}/`);
+
+// Conversion en HTML (Desktop)
+const contentHtml = await parseMarkdown(fullMarkdown);
+
+// Conversion en HTML (Mobile) - On doit refaire la boucle proprement pour l'async
+const pagesContentPromises = pages.map(async (page) => {
+  try {
+    const content = fs.readFileSync(page.file, "utf-8");
+    const parts = content.split("---");
+    let rawBody =
+      parts.length >= 3 ? parts.slice(2).join("---").trim() : content;
+
+    rawBody = rawBody.replace(/\]\(images\//g, `](/images/${docId}/`);
+    rawBody = rawBody.replace(/src="images\//g, `src="/images/${docId}/`);
+
+    return await parseMarkdown(rawBody);
+  } catch (e) {
+    return "";
+  }
+});
+
+const pagesContent = await Promise.all(pagesContentPromises);
+const currentFrontmatter = pages[0]?.frontmatter || {};
+---
+
+<ReaderLayout frontmatter={{ title: title }}>
+  <!-- Composant React pour appliquer les styles dynamiques depuis le store Zustand -->
+  <ReaderStyleProvider client:load />
+
+  <ReaderNavbar backUrl="/library" />
+  <TableOfContents />
+  <InfoPanel client:load frontmatter={currentFrontmatter} />
+
+  <BarreProgression />
+  <FiltreDaltonisme />
+
+  <!-- Composants d'accessibilité React -->
+  <RegleLecture client:load />
+  <FocusLigne client:load />
+  <FocusParagraphe client:load />
+  <ModeParagrapheParParagraphe client:load />
+  <TextTransformations client:load />
+  <WordDefinition client:load />
+  <ProgressTracker client:only="react" docId={docId} />
+
+  <!-- Version Desktop (Scroll Vertical Continu) -->
+  <div class="document-container desktop-view" id="doc-container">
+    <h1 class="document-title">{title}</h1>
+
+    <div class="pages-list flex items-center justify-center">
+      <div class="page-container">
+        <div class="page-content" id="content-area" set:html={contentHtml} />
+      </div>
+    </div>
+  </div>
+
+  <!-- Version Mobile (Slider Horizontal) -->
+  <div class="mobile-view" id="mobile-reader">
+    <div class="mobile-slider" id="mobile-slider">
+      {
+        pagesContent.map((html, index) => (
+          <div class="mobile-page">
+            <div class="mobile-page-content page-content" set:html={html} />
+            <div class="mobile-page-number">
+              {index + 1} / {pagesContent.length}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</ReaderLayout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const docContainer = document.getElementById("doc-container");
+  const mobileReader = document.getElementById("mobile-reader");
+
+  // Gestion de la barre de progression
+</script>
+
+<style>
+  /* Ajustement pour la navbar fixe */
+  .document-container {
+    padding-top: 2rem;
+  }
+
+  /* Mobile View Styles */
+  .mobile-view {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-view {
+      display: none;
+    }
+
+    .mobile-view {
+      display: block;
+      height: calc(100vh - 60px); /* Moins la hauteur de la navbar */
+      width: 100vw;
+      overflow: hidden;
+      position: fixed;
+      top: 60px; /* Sous la navbar */
+      left: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .mobile-slider {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      height: 100%;
+      width: 100%;
+      /* Hide scrollbar */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .mobile-slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-page {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      overflow-y: auto;
+      padding: 4rem 1.5rem 1rem 1.5rem; /* Espace pour header/footer */
+      box-sizing: border-box;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-page-number {
+      margin-top: auto;
+      align-self: center;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+  }
+
+  .document-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--accent-color);
+  }
+
+  .pages-list {
+    border-radius: 4px;
+    /* overflow: hidden; Supprimé car empêche position: sticky de fonctionner sur Desktop */
+  }
+
+  .page-container {
+    margin-bottom: 0;
+    padding: 3rem;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1); /* Séparateur discret pour marquer la fin de page */
+    max-width: var(--max-page-content-width);
+  }
+
+  .page-container:last-child {
+    border-bottom: none;
+  }
+
+  .page-header {
+    font-size: 0.8rem;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: right;
+  }
+
+  .page-content {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    text-align: var(--text-align);
+    letter-spacing: var(--letter-spacing-base);
+    word-spacing: var(--word-spacing-base);
+    color: var(--text-color);
+  }
+
+  /* --- Styles Markdown Liseuse --- */
+
+  /* Titres */
+  .page-content :global(h1),
+  .page-content :global(h2),
+  .page-content :global(h3),
+  .page-content :global(h4),
+  .page-content :global(h5),
+  .page-content :global(h6) {
+    font-family: var(--font-heading);
+    margin-top: var(--heading-margin-top);
+    margin-bottom: var(--heading-margin-bottom);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-color);
+  }
+
+  .page-content :global(h1) {
+    font-size: 2em;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.3em;
+    text-align: center;
+  }
+
+  .page-content :global(h2) {
+    font-size: 1.5em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.2em;
+  }
+
+  .page-content :global(h3) {
+    font-size: 1.25em;
+  }
+
+  /* Paragraphes */
+  .page-content :global(p) {
+    margin-bottom: var(--paragraph-spacing);
+    margin-top: 0;
+    text-align: inherit; /* Hérite du justify/left global */
+  }
+
+  /* Listes */
+  .page-content :global(ul),
+  .page-content :global(ol) {
+    margin-bottom: var(--paragraph-spacing);
+    padding-left: 2em;
+  }
+
+  .page-content :global(li) {
+    margin-bottom: 0.5em;
+  }
+
+  /* Citations (Blockquotes) */
+  .page-content :global(blockquote) {
+    margin: 2em 0;
+    padding: 1em 1.5em;
+    border-left: 4px solid var(--accent-color);
+    background-color: rgba(0, 0, 0, 0.03);
+    font-style: italic;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .page-content :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  /* Code */
+  .page-content :global(code) {
+    font-family: var(--font-code, monospace);
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .page-content :global(pre) {
+    background-color: #2d2d2d;
+    color: #f8f8f2;
+    padding: 1.5em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: var(--paragraph-spacing);
+  }
+
+  .page-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Images */
+  .page-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 2em auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Liens */
+  .page-content :global(a) {
+    color: var(--link-color);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--link-color);
+    transition: all 0.2s;
+  }
+
+  .page-content :global(a:hover) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  /* Tableaux */
+  .page-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--paragraph-spacing);
+  }
+
+  .page-content :global(th),
+  .page-content :global(td) {
+    padding: 0.75em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: left;
+  }
+
+  .page-content :global(th) {
+    background-color: var(
+      --bg-color
+    ); /* Fond opaque pour cacher le contenu défilant */
+    background-image: linear-gradient(
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.03)
+    ); /* Teinte grise */
+    font-weight: 600;
+    position: sticky;
+    top: 80px; /* Desktop: Sous la navbar (~60px + marge) */
+    z-index: 5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 768px) {
+    .page-content :global(th) {
+      top: 0; /* Mobile: Au top du conteneur de scroll (qui commence sous la navbar) */
+    }
+  }
+
+  /* Séparateurs */
+  .page-content :global(hr) {
+    border: 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 3em auto;
+    width: 50%;
+  }
+
+  .page-separator {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin-top: 3rem;
+    display: none; /* Caché car on a des boites séparées */
+  }
+</style>

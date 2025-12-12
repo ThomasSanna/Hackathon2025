@@ -1,0 +1,251 @@
+---
+import type { Frontmatter } from "../../pages/reader/[id].astro";
+
+interface Props {
+  frontmatter: Frontmatter;
+}
+
+const { frontmatter } = Astro.props;
+
+// Helper pour formater les dates
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+---
+
+<aside id="info-panel" class="info-panel">
+  <div class="panel-header">
+    <h2>Informations</h2>
+    <button id="close-info" class="close-btn">&times;</button>
+  </div>
+
+  <div class="panel-content">
+    {
+      frontmatter.document_title && (
+        <div class="info-item">
+          <h3>Titre</h3>
+          <p>{frontmatter.document_title}</p>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.document_type && (
+        <div class="info-item">
+          <h3>Type</h3>
+          <span class="tag">{frontmatter.document_type}</span>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.date && (
+        <div class="info-item">
+          <h3>Date</h3>
+          <p>{formatDate(frontmatter.date)}</p>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.authors && frontmatter.authors.length > 0 && (
+        <div class="info-item">
+          <h3>Auteurs</h3>
+          <ul class="info-list">
+            {frontmatter.authors.map((author) => (
+              <li>{author}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.organizations && frontmatter.organizations.length > 0 && (
+        <div class="info-item">
+          <h3>Organisations</h3>
+          <ul class="info-list">
+            {frontmatter.organizations.map((org) => (
+              <li>{org}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.summary && (
+        <div class="info-item">
+          <h3>Résumé</h3>
+          <p class="summary-text">{frontmatter.summary}</p>
+        </div>
+      )
+    }
+
+    {
+      frontmatter.key_points && frontmatter.key_points.length > 0 && (
+        <div class="info-item">
+          <h3>Points Clés</h3>
+          <ul class="key-points-list">
+            {frontmatter.key_points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</aside>
+
+<div id="info-overlay" class="panel-overlay"></div>
+
+<style>
+  .info-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    transform: translateX(100%); /* Caché par défaut */
+    width: 350px;
+    height: 100vh;
+    background: var(--bg-color);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 200;
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .info-panel.open {
+    transform: translateX(0);
+  }
+
+  .panel-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--accent-color);
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+  }
+
+  .panel-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .info-item {
+    margin-bottom: 2rem;
+  }
+
+  .info-item h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+  }
+
+  .info-item p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .info-list,
+  .key-points-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .info-list li {
+    margin-bottom: 0.3rem;
+  }
+
+  .key-points-list li {
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .key-points-list li::before {
+    content: "•";
+    color: var(--accent-color);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+  }
+
+  .summary-text {
+    font-style: italic;
+    color: #555;
+  }
+
+  .panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .panel-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 768px) {
+    .info-panel {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const infoPanel = document.getElementById("info-panel");
+  const infoOverlay = document.getElementById("info-overlay");
+  const closeBtn = document.getElementById("close-info");
+  const toggleBtn = document.getElementById("info-toggle"); // Dans la navbar
+
+  function toggleInfo() {
+    infoPanel?.classList.toggle("open");
+    infoOverlay?.classList.toggle("active");
+  }
+
+  toggleBtn?.addEventListener("click", toggleInfo);
+  closeBtn?.addEventListener("click", toggleInfo);
+  infoOverlay?.addEventListener("click", toggleInfo);
+</script>

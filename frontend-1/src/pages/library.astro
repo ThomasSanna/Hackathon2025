@@ -1,0 +1,69 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LibraryManager from "../components/library/LibraryManager";
+
+interface Frontmatter {
+  document_title?: string;
+  authors?: string[];
+  summary?: string;
+  date?: string;
+  images?: { id: string; filename: string }[];
+  [key: string]: any;
+}
+
+// Récupère tous les fichiers markdown pour lister les documents disponibles
+const allPages = await Astro.glob<Frontmatter>("./output_2/**/*.md");
+
+// Extrait les IDs de documents uniques et leurs métadonnées
+const documents = new Map<string, any>();
+
+allPages.forEach((page) => {
+  const parts = page.file.split(/[/\\]/);
+  const outputIndex = parts.indexOf("output_2");
+  if (outputIndex !== -1 && parts.length > outputIndex + 1) {
+    const docId = parts[outputIndex + 1];
+    
+    // On ne garde que la première page ou on fusionne les infos
+    if (!documents.has(docId) || (page.url && page.url.endsWith("page_1"))) {
+      const isPage1 = page.url?.endsWith("page_1") || page.file.endsWith("page_1.md");
+      
+      // Si c'est la page 1, on est sûr d'avoir les bonnes métadonnées
+      if (isPage1 || !documents.has(docId)) {
+        documents.set(docId, {
+          id: docId,
+          title: page.frontmatter.document_title || docId.replace(".Zeendoc", "").replace(/_/g, " "),
+          authors: page.frontmatter.authors || [],
+          date: page.frontmatter.date || "",
+          summary: page.frontmatter.summary || "",
+          imageUrl: page.frontmatter.images && page.frontmatter.images.length > 0
+            ? `/images/${docId}/${page.frontmatter.images[0].filename}` // Hypothetical path - needs adjustment based on where images are served
+            : null,
+            // Actually images are in `src/pages/output_2/.../images/` usually? 
+            // In the file viewed: `![[image] - ...](images/page1_img1.jpg)` 
+            // The file is in `.../23248.Zeendoc/page_1.md`.
+            // So images are relative. 
+            // We need to construct a valid URL for the image.
+            // If Astro serves them, it might be tricky without moving them to public.
+            // For now, let's try to map it or allow broken image with fallback.
+          rawDate: page.frontmatter.date
+        });
+      }
+    }
+  }
+});
+
+const docList = Array.from(documents.values());
+---
+
+<Layout>
+  <div class="library-page">
+    <LibraryManager client:only="react" documents={docList} />
+  </div>
+</Layout>
+
+<style>
+  .library-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+  }
+</style>

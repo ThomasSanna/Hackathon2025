@@ -1,0 +1,84 @@
+{
+    "espace_mot": 0,
+    "espace_lettre": 0,
+    "font": "Arial",
+    "interligne": 1,
+    "alignement_texte": "gauche",
+    "longueur_liseuse": 100,
+    "theme": {
+        "couleur_fond": "#FFFFFF",
+        "couleur_texte": "#000000",
+        "couleur_surlignage": "#FFFF00"
+    },
+    "dyslexie": {
+        "alternement_typo": false,
+        "soulignement_syllabes": false,
+        "phonemes": {
+            "an": {
+                "couleur": "#FF0000",
+                "actif": false
+            },
+            "on": {
+                "couleur": "#00CC00",
+                "actif": false
+            },
+            "in": {
+                "couleur": "#0066FF",
+                "actif": false
+            },
+            "ou": {
+                "couleur": "#FF6600",
+                "actif": false
+            },
+            "oi": {
+                "couleur": "#CC00FF",
+                "actif": false
+            },
+            "eu": {
+                "couleur": "#00CCCC",
+                "actif": false
+            },
+            "ai": {
+                "couleur": "#FFB300",
+                "actif": false
+            },
+            "ui": {
+                "couleur": "#FF0099",
+                "actif": false
+            },
+            "gn": {
+                "couleur": "#006633",
+                "actif": false
+            },
+            "ill": {
+                "couleur": "#9933FF",
+                "actif": false
+            },
+            "eau": {
+                "couleur": "#FF3333",
+                "actif": false
+            },
+            "au": {
+                "couleur": "#3399FF",
+                "actif": false
+            },
+            "en": {
+                "couleur": "#FFCC00",
+                "actif": false
+            }
+        },
+        "lettres_muettes": false
+    },
+    "semantique": {
+        "nom_propre": false,
+        "date_chiffre": false,
+        "mot_long": false
+    },
+    "mode_p_p": false,
+    "barre_progression": false,
+    "focus_paragraphe": false,
+    "regle_lecture": false,
+    "ligne_focus": false,
+    "daltonien": "Aucun"
+}
+

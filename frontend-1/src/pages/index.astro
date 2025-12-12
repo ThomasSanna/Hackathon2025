@@ -1,0 +1,649 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <div class="home-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Gestion Documentaire
+          <span class="hero-accent">Intelligente</span>
+        </h1>
+        <p class="hero-subtitle">
+          Importez, analysez et gérez vos documents en toute simplicité.
+          Glissez-déposez vos fichiers pour commencer.
+        </p>
+      </div>
+    </section>
+
+    <!-- Drag and Drop Zone -->
+    <section class="upload-section">
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-content">
+          <div class="dropzone-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h2 class="dropzone-title">Glissez vos documents ici</h2>
+          <p class="dropzone-subtitle">
+            ou cliquez pour sélectionner des fichiers
+          </p>
+          <div class="dropzone-formats">
+            <span class="format-badge">PDF</span>
+            <span class="format-badge">DOCX</span>
+            <span class="format-badge">Images</span>
+            <span class="format-badge">TXT</span>
+          </div>
+          <input
+            type="file"
+            id="file-input"
+            class="file-input"
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+          />
+        </div>
+
+        <!-- Upload Progress (hidden by default) -->
+        <div
+          class="upload-progress"
+          id="upload-progress"
+          style="display: none;"
+        >
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <p class="progress-text" id="progress-text">
+            Téléchargement en cours...
+          </p>
+        </div>
+      </div>
+
+      <!-- File List -->
+      <div class="file-list" id="file-list" style="display: none;">
+        <h3 class="file-list-title">Fichiers sélectionnés</h3>
+        <ul class="files" id="files"></ul>
+        <button class="upload-btn" id="upload-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Télécharger les fichiers
+        </button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3 class="feature-title">Analyse OCR</h3>
+          <p class="feature-description">
+            Extraction automatique du texte de vos documents scannés avec une
+            précision optimale.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Recherche Intelligente</h3>
+          <p class="feature-description">
+            Retrouvez instantanément vos documents grâce à notre moteur de
+            recherche avancé.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Accessibilité</h3>
+          <p class="feature-description">
+            Mode dyslexie et options d'affichage pour une lecture confortable
+            pour tous.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    text-align: center;
+    padding: 3rem 0;
+  }
+
+  .hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+    line-height: 1.2;
+  }
+
+  .hero-accent {
+    background: linear-gradient(
+      135deg,
+      var(--bleu-logo) 0%,
+      var(--rouge-logo) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Upload Section */
+  .upload-section {
+    margin: 2rem 0 4rem;
+  }
+
+  .dropzone {
+    border: 3px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-secondary);
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .dropzone:hover,
+  .dropzone.drag-over {
+    border-color: var(--bleu-logo);
+    background: rgba(0, 0, 100, 0.02);
+  }
+
+  .dropzone.drag-over {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .dropzone-content {
+    pointer-events: none;
+  }
+
+  .dropzone-icon {
+    color: var(--bleu-logo);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .dropzone-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+  }
+
+  .dropzone-subtitle {
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem;
+  }
+
+  .dropzone-formats {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .format-badge {
+    background: linear-gradient(135deg, var(--bleu-logo) 0%, #0000a0 100%);
+    color: white;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Upload Progress */
+  .upload-progress {
+    margin-top: 2rem;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bleu-logo), var(--rouge-logo));
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  /* File List */
+  .file-list {
+    margin-top: 2rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .file-list-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+    color: var(--text-primary);
+  }
+
+  .files {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+  }
+
+  .files li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .files li:last-child {
+    margin-bottom: 0;
+  }
+
+  .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--bleu-logo) 0%, #0000a0 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 100, 0.3);
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 2rem 0;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 100, 0.1) 0%,
+      rgba(249, 69, 65, 0.1) 100%
+    );
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bleu-logo);
+    margin-bottom: 1.25rem;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem;
+  }
+
+  .feature-description {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .dropzone {
+      padding: 2rem;
+    }
+
+    .dropzone-title {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  import { OCRApi, checkBackendHealth } from "../utils/api";
+  import { addDocument, saveDocuments, setBackendConnected, initStore } from "../stores/appStore";
+
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-input");
+  const fileList = document.getElementById("file-list");
+  const filesContainer = document.getElementById("files");
+  const uploadProgress = document.getElementById("upload-progress");
+  const progressFill = document.getElementById("progress-fill");
+  const progressText = document.getElementById("progress-text");
+
+  let selectedFiles: File[] = [];
+
+  // Initialiser le store et vérifier la connexion backend
+  initStore();
+  
+  (async () => {
+    const isConnected = await checkBackendHealth();
+    setBackendConnected(isConnected);
+    
+    if (!isConnected) {
+      console.warn("⚠️ Backend non accessible. Vérifiez que le serveur FastAPI est démarré sur le port 8000.");
+    } else {
+      console.log("✓ Backend connecté avec succès");
+    }
+  })();
+
+  // Drag and drop events
+  dropzone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.classList.add("drag-over");
+  });
+
+  dropzone?.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("drag-over");
+  });
+
+  dropzone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("drag-over");
+
+    const files = e.dataTransfer?.files;
+    if (files) {
+      handleFiles(files);
+    }
+  });
+
+  // File input change
+  fileInput?.addEventListener("change", (e) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files) {
+      handleFiles(target.files);
+    }
+  });
+
+  function handleFiles(files: FileList) {
+    // Filtrer pour n'accepter que les PDFs
+    const pdfFiles = Array.from(files).filter(file => 
+      file.name.toLowerCase().endsWith('.pdf')
+    );
+    
+    if (pdfFiles.length !== files.length) {
+      alert("⚠️ Seuls les fichiers PDF sont acceptés pour le moment.");
+    }
+    
+    selectedFiles = pdfFiles;
+    displayFiles();
+  }
+
+  function displayFiles() {
+    if (selectedFiles.length === 0) {
+      if (fileList) fileList.style.display = "none";
+      return;
+    }
+
+    if (fileList) fileList.style.display = "block";
+    if (filesContainer) {
+      filesContainer.innerHTML = selectedFiles
+        .map(
+          (file, index) => `
+        <li>
+          <span>${file.name}</span>
+          <span style="color: var(--text-secondary);">${formatFileSize(file.size)}</span>
+        </li>
+      `
+        )
+        .join("");
+    }
+  }
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  // Upload button
+  document.getElementById("upload-btn")?.addEventListener("click", async () => {
+    if (selectedFiles.length === 0) return;
+
+    // Afficher la progression
+    if (uploadProgress) uploadProgress.style.display = "block";
+    if (progressFill) progressFill.style.width = "0%";
+    if (progressText) progressText.textContent = "Préparation de l'upload...";
+
+    const processedDocuments: any[] = [];
+
+    try {
+      // Traiter chaque fichier
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        
+        // Mettre à jour le texte de progression
+        if (progressText) {
+          progressText.textContent = `Traitement de ${file.name} (${i + 1}/${selectedFiles.length})...`;
+        }
+
+        // Utiliser l'API centralisée pour traiter le PDF
+        const result = await OCRApi.processPDF(file, {
+          use_bbox_annotation: true,
+          use_document_annotation: true,
+          max_pages: 32,
+          generate_analysis: true,
+        });
+
+        console.log("✓ Résultat OCR:", result);
+
+        // Ajouter le document au store
+        if (result.success) {
+          const document = {
+            id: crypto.randomUUID(),
+            name: file.name,
+            path: result.data.output_dir,
+            uploadDate: new Date(),
+            totalPages: result.data.total_pages,
+            totalImages: result.data.total_images,
+            hasAnalysis: !!result.data.analysis,
+            metadata: {
+              markdown_files: result.data.markdown_files,
+              metadata_path: result.data.metadata_path,
+              document_annotation: result.data.document_annotation,
+              analysis: result.data.analysis,
+            },
+          };
+          
+          addDocument(document);
+          processedDocuments.push(document);
+        }
+
+        // Mettre à jour la progression
+        const progress = ((i + 1) / selectedFiles.length) * 100;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+      }
+
+      // Sauvegarder les documents
+      saveDocuments();
+
+      // Upload terminé
+      if (progressText) {
+        progressText.textContent = `✓ ${processedDocuments.length} fichier(s) traité(s) avec succès !`;
+      }
+      if (progressFill) progressFill.style.width = "100%";
+
+      // Nettoyer après un délai
+      setTimeout(() => {
+        if (uploadProgress) uploadProgress.style.display = "none";
+        if (progressFill) progressFill.style.width = "0%";
+        selectedFiles = [];
+        displayFiles();
+        
+        // Rediriger vers la bibliothèque
+        window.location.href = "/library";
+      }, 2000);
+
+    } catch (error) {
+      console.error("❌ Erreur lors de l'upload:", error);
+      if (progressText) {
+        progressText.textContent = `Erreur: ${error instanceof Error ? error.message : "Une erreur est survenue"}`;
+        progressText.style.color = "var(--rouge-logo)";
+      }
+      
+      // Réinitialiser après un délai
+      setTimeout(() => {
+        if (uploadProgress) uploadProgress.style.display = "none";
+        if (progressFill) progressFill.style.width = "0%";
+        if (progressText) {
+          progressText.style.color = "";
+          progressText.textContent = "Téléchargement en cours...";
+        }
+      }, 5000);
+    }
+  });
+</script>

@@ -1,0 +1,369 @@
+---
+interface Props {
+  backUrl?: string;
+}
+
+const { backUrl = "/library" } = Astro.props;
+---
+
+<nav class="reader-navbar">
+  <div class="navbar-left">
+    <button id="toc-toggle" class="icon-btn" aria-label="Table des matières">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><line x1="3" y1="12" x2="21" y2="12"></line><line
+          x1="3"
+          y1="6"
+          x2="21"
+          y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg
+      >
+    </button>
+  </div>
+
+  <div class="navbar-center">
+    <div class="search-container">
+      <svg
+        class="search-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><circle cx="11" cy="11" r="8"></circle><line
+          x1="21"
+          y1="21"
+          x2="16.65"
+          y2="16.65"></line></svg
+      >
+      <input type="text" id="doc-search" placeholder="Rechercher..." />
+      <span id="search-count" class="search-count"></span>
+    </div>
+  </div>
+
+  <div class="navbar-right flex gap-3">
+    <button id="info-toggle" class="icon-btn" aria-label="Informations">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><circle cx="12" cy="12" r="10"></circle><line
+          x1="12"
+          y1="16"
+          x2="12"
+          y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg
+      >
+    </button>
+    <a href={backUrl} class="icon-btn" aria-label="Retour">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline
+          points="16 17 21 12 16 7"></polyline><line
+          x1="21"
+          y1="12"
+          x2="9"
+          y2="12"></line></svg
+      >
+    </a>
+  </div>
+</nav>
+
+<style>
+  .reader-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    padding: 0 1rem;
+
+    /* Modern Glassmorphism & Floating Style */
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    max-width: 1200px;
+    border-radius: 16px; /* Carré arrondi */
+
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    z-index: 100;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .reader-navbar.hidden {
+    transform: translate(-50%, -150%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .icon-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    width: 300px;
+    transition: width 0.3s;
+  }
+
+  .search-container:focus-within {
+    background: #fff;
+    box-shadow: 0 0 0 2px var(--accent-color);
+    width: 400px;
+  }
+
+  .search-icon {
+    margin-right: 0.5rem;
+    opacity: 0.5;
+  }
+
+  #doc-search {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    color: var(--text-color);
+  }
+
+  .search-count {
+    font-size: 0.75rem;
+    color: #888;
+    white-space: nowrap;
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .search-container {
+      width: 150px;
+    }
+    .search-container:focus-within {
+      width: 200px;
+    }
+  }
+</style>
+
+<script>
+  // Logique de recherche simple
+  const searchInput = document.getElementById("doc-search") as HTMLInputElement;
+  const contentArea = document.getElementById("content-area");
+  const searchCount = document.getElementById("search-count");
+
+  let currentMatchIndex = -1;
+  let totalMatches = 0;
+
+  if (searchInput && contentArea) {
+    searchInput.addEventListener("input", (e) => {
+      const term = (e.target as HTMLInputElement).value;
+
+      // Reset si vide
+      if (!term || term.length < 2) {
+        removeHighlights();
+        if (searchCount) searchCount.textContent = "";
+        currentMatchIndex = -1;
+        totalMatches = 0;
+        return;
+      }
+
+      highlightText(term);
+    });
+
+    // Navigation avec Entrée
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && totalMatches > 0) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          // Précédent
+          currentMatchIndex =
+            (currentMatchIndex - 1 + totalMatches) % totalMatches;
+        } else {
+          // Suivant
+          currentMatchIndex = (currentMatchIndex + 1) % totalMatches;
+        }
+        focusMatch(currentMatchIndex);
+      }
+    });
+  }
+
+  function removeHighlights() {
+    const marks = document.querySelectorAll("mark.search-highlight");
+    marks.forEach((mark) => {
+      const parent = mark.parentNode;
+      if (parent) {
+        parent.replaceChild(
+          document.createTextNode(mark.textContent || ""),
+          mark
+        );
+        parent.normalize();
+      }
+    });
+  }
+
+  function focusMatch(index: number) {
+    const marks = document.querySelectorAll("mark.search-highlight");
+    if (marks.length === 0 || index < 0 || index >= marks.length) return;
+
+    // Reset styles
+    marks.forEach((m) => {
+      (m as HTMLElement).style.backgroundColor = "#ffeb3b"; // Jaune standard
+      (m as HTMLElement).style.outline = "none";
+    });
+
+    // Focus current
+    const current = marks[index] as HTMLElement;
+    current.style.backgroundColor = "#ff9800"; // Orange pour l'actif
+    current.style.outline = "2px solid #e65100";
+
+    current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    if (searchCount) {
+      searchCount.textContent = `${index + 1}/${totalMatches}`;
+    }
+  }
+
+  function highlightText(term: string) {
+    removeHighlights(); // Nettoyer d'abord
+
+    if (!term) return;
+
+    const contentArea = document.getElementById("content-area");
+    if (!contentArea) return;
+
+    const walker = document.createTreeWalker(
+      contentArea,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+    const nodesToReplace: { node: Node; matches: RegExpMatchArray[] }[] = [];
+    const regex = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+
+    let node;
+    while ((node = walker.nextNode())) {
+      const matches = [...(node.textContent || "").matchAll(regex)];
+      if (matches.length > 0) {
+        nodesToReplace.push({ node, matches });
+      }
+    }
+
+    let count = 0;
+    // Remplacement inverse pour ne pas casser les offsets
+    for (const { node, matches } of nodesToReplace) {
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      const text = node.textContent || "";
+
+      matches.forEach((match) => {
+        count++;
+        // Texte avant
+        fragment.appendChild(
+          document.createTextNode(text.slice(lastIndex, match.index))
+        );
+
+        // Le match surligné
+        const mark = document.createElement("mark");
+        mark.className = "search-highlight";
+        mark.textContent = match[0];
+        mark.style.backgroundColor = "#ffeb3b";
+        mark.style.color = "#000";
+        fragment.appendChild(mark);
+
+        lastIndex = (match.index || 0) + match[0].length;
+      });
+
+      // Texte restant
+      fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+
+      if (node.parentNode) {
+        node.parentNode.replaceChild(fragment, node);
+      }
+    }
+
+    totalMatches = count;
+    if (totalMatches > 0) {
+      currentMatchIndex = 0;
+      focusMatch(0); // Focus le premier automatiquement
+    } else {
+      if (searchCount) searchCount.textContent = "0";
+    }
+  }
+
+  // Gestion du scroll pour cacher/montrer la navbar
+  let lastScrollY = window.scrollY;
+  const navbar = document.querySelector(".reader-navbar");
+
+  window.addEventListener("scroll", () => {
+    if (!navbar) return;
+
+    const currentScrollY = window.scrollY;
+
+    // Seuil de 100px pour éviter de cacher tout de suite en haut de page
+    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      navbar.classList.add("hidden");
+    } else {
+      navbar.classList.remove("hidden");
+    }
+    lastScrollY = currentScrollY;
+  });
+
+  // Montrer la navbar si la souris est en haut de l'écran
+  document.addEventListener("mousemove", (e) => {
+    if (!navbar) return;
+    if (e.clientY < 80) {
+      // Zone de détection
+      navbar.classList.remove("hidden");
+    }
+  });
+</script>
