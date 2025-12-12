@@ -32,6 +32,7 @@ import ModeParagrapheParParagraphe from "@src/components/reader/ModeParagraphePa
 import TextTransformations from "@src/components/reader/TextTransformations";
 import WordDefinition from "@src/components/reader/WordDefinition";
 import ProgressTracker from "@src/components/reader/ProgressTracker";
+import ChatBot from "@src/components/reader/ChatBot";
 
 // Configuration du processeur Markdown
 const processor = unified()
@@ -142,6 +143,14 @@ const title = pages[0]?.frontmatter?.document_title || docId;
 const mindMapPath = `src/pages/output_2/${docId}/mind_map/mind_map.md`;
 const hasMindMap = fs.existsSync(mindMapPath);
 
+// Vérification de l'existence du fichier PDF source pour le chatbot
+const sourceDirPath = `src/pages/output_2/${docId}/source`;
+let hasPdfSource = false;
+if (fs.existsSync(sourceDirPath)) {
+  const files = fs.readdirSync(sourceDirPath);
+  hasPdfSource = files.some((f: string) => f.endsWith(".pdf"));
+}
+
 // Fusion du contenu
 let fullMarkdown = "";
 
@@ -227,6 +236,9 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
   <TextTransformations client:load />
   <WordDefinition client:load />
   <ProgressTracker client:only="react" docId={docId} />
+
+  <!-- ChatBot IA pour QnA sur le document -->
+  {hasPdfSource && <ChatBot client:load docId={docId} />}
 
   <!-- Version Desktop (Scroll Vertical Continu) -->
   <div class="document-container desktop-view" id="doc-container">
