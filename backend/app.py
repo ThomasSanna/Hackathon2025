@@ -96,7 +96,7 @@ async def process_pdf_ocr(
     file: UploadFile = File(...),
     use_bbox_annotation: bool = True,
     use_document_annotation: bool = True,
-    max_pages: int = 32,
+    max_pages: int = 8,
     generate_analysis: bool = True
 ):
     """
@@ -182,8 +182,6 @@ async def process_pdf_ocr(
                 logger.exception("Traceback complet de l'erreur d'analyse:")
                 response_data["data"]["analysis_error"] = str(analysis_error)
                 response_data["message"] += " | Erreur lors de l'analyse sémantique"
-            finally:
-                logger.info(f"🌍 Empreinte carbone de l'analyse sémantique: {emissions} kg CO2eq")
         return JSONResponse(content=response_data)
         
     except Exception as e:

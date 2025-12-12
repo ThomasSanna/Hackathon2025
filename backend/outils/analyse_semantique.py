@@ -391,7 +391,7 @@ Génère une carte mentale avec:
             logger.info(f"✓ Résultat JSON sauvegardé: {json_path}")
             
             # Sauvegarder la carte mentale Mermaid
-            mindmap_path = output_dir / "mind_map.md"
+            mindmap_path = output_dir / "mind_map/mind_map.md"
             with open(mindmap_path, "w", encoding="utf-8") as f:
                 f.write(f"# Carte Mentale - {summary.title}\n\n")
                 f.write("```mermaid\n")
