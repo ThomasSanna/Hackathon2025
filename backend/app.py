@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 import logging
+import wikipedia
+import requests
 from outils.commandes_vocales import VoiceCommandAgent, CommandResponse, create_default_config
 from outils.ocr_processor import OCRProcessor
 from outils.statistique_lecture import analyser_texte_lu
@@ -53,6 +55,12 @@ class VoiceCommandRequest(BaseModel):
 class TextAnalysisRequest(BaseModel):
     """Requete d'analyse de texte"""
     texte: str
+
+
+class WikipediaSearchRequest(BaseModel):
+    """Requete de recherche Wikipedia"""
+    nom: str
+    langue: str = "fr"  # Langue par défaut: français
 
 
 @app.get("/")
@@ -217,3 +225,86 @@ async def analyse_texte(request: TextAnalysisRequest):
             detail=f"Erreur lors de l'analyse du texte: {str(e)}"
         )
 
+
+@app.post("/api/wikipedia/search")
+async def search_wikipedia(request: WikipediaSearchRequest):
+    """
+    Recherche une personne/sujet sur Wikipedia et retourne les premières lignes.
+    
+    Args:
+        request: Requête contenant le nom à rechercher et la langue
+        
+    Returns:
+        JSON avec la description, l'URL et d'autres informations
+    """
+    if not request.nom or not request.nom.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Le nom ne peut pas être vide"
+        )
+    
+    try:
+        # Configurer la langue de Wikipedia
+        wikipedia.set_lang(request.langue)
+        
+        # Rechercher la page
+        try:
+            # Recherche de la page exacte
+            page = wikipedia.page(request.nom, auto_suggest=True)
+            
+            # Extraire le résumé (premières lignes)
+            summary = wikipedia.summary(request.nom, sentences=3, auto_suggest=True)
+            
+            # Obtenir l'image principale si disponible
+            images = page.images[:3] if page.images else []
+            
+            # Préparer la réponse
+            response_data = {
+                "success": True,
+                "data": {
+                    "titre": page.title,
+                    "description": summary,
+                    "url": page.url,
+                    "images": images,
+                    "categories": page.categories[:5] if hasattr(page, 'categories') else [],
+                    "langue": request.langue,
+                    "contenu_complet_disponible": True
+                }
+            }
+            
+            return JSONResponse(content=response_data)
+            
+        except wikipedia.DisambiguationError as e:
+            # Page d'homonymie trouvée - retourner les options
+            return JSONResponse(content={
+                "success": False,
+                "error": "disambiguation",
+                "message": f"Plusieurs résultats trouvés pour '{request.nom}'",
+                "options": e.options[:10],  # Limiter à 10 options
+                "suggestion": "Veuillez préciser votre recherche"
+            })
+            
+        except wikipedia.PageError:
+            # Page non trouvée - essayer une recherche
+            search_results = wikipedia.search(request.nom, results=5)
+            
+            if search_results:
+                return JSONResponse(content={
+                    "success": False,
+                    "error": "page_not_found",
+                    "message": f"Aucune page exacte trouvée pour '{request.nom}'",
+                    "suggestions": search_results,
+                    "suggestion": "Voici quelques suggestions"
+                })
+            else:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Aucun résultat trouvé pour '{request.nom}'"
+                )
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la recherche Wikipedia: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la recherche: {str(e)}"
+        )
