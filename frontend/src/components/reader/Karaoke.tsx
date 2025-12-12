@@ -1,6 +1,111 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
+// Fonction utilitaire pour normaliser les dates dans le texte
+const prepareTextForSpeech = (text: string) => {
+  const months = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+  ];
+
+  let spokenText = "";
+  const segments: { originalStart: number; originalLength: number; spokenStart: number; spokenLength: number; isModified: boolean }[] = [];
+  let lastIndex = 0;
+
+  // Regex pour DD/MM/YYYY ou DD-MM-YYYY ou YYYY-MM-DD ou YYYY-YYYY (avec support espaces et tirets)
+  const regex = /\b((\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4}))|((\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2}))|((\d{4})\s?[-–]\s?(\d{4}))\b/g;
+  
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    // Ajouter le texte avant le match
+    const preText = text.substring(lastIndex, match.index);
+    if (preText) {
+        segments.push({
+            originalStart: lastIndex,
+            originalLength: preText.length,
+            spokenStart: spokenText.length,
+            spokenLength: preText.length,
+            isModified: false
+        });
+        spokenText += preText;
+    }
+
+    if (match[9]) {
+        // Cas YYYY-YYYY
+        const startYear = match[10];
+        const endYear = match[11];
+        const replacement = `${startYear} à ${endYear}`;
+        
+        segments.push({
+            originalStart: match.index,
+            originalLength: match[0].length,
+            spokenStart: spokenText.length,
+            spokenLength: replacement.length,
+            isModified: true
+        });
+        spokenText += replacement;
+        lastIndex = match.index + match[0].length;
+    } else {
+        let day, month, year;
+        if (match[2]) {
+           // DD/MM/YYYY
+           day = match[2]; month = match[3]; year = match[4];
+        } else {
+           // YYYY-MM-DD
+           year = match[6]; month = match[7]; day = match[8];
+        }
+
+        const m = parseInt(month, 10);
+        if (m >= 1 && m <= 12) {
+            // Convertir la date
+            let d = parseInt(day, 10);
+            const dayStr = d === 1 ? "premier" : d.toString();
+            const replacement = `${dayStr} ${months[m - 1]} ${year}`;
+            
+            segments.push({
+                originalStart: match.index,
+                originalLength: match[0].length,
+                spokenStart: spokenText.length,
+                spokenLength: replacement.length,
+                isModified: true
+            });
+            spokenText += replacement;
+        } else {
+            // Date invalide (mois hors limites), on garde le texte original
+            segments.push({
+                originalStart: match.index,
+                originalLength: match[0].length,
+                spokenStart: spokenText.length,
+                spokenLength: match[0].length,
+                isModified: false
+            });
+            spokenText += match[0];
+        }
+        lastIndex = match.index + match[0].length;
+    }
+  }
+
+  // Ajouter le reste du texte
+  const remaining = text.substring(lastIndex);
+  if (remaining) {
+      segments.push({
+          originalStart: lastIndex,
+          originalLength: remaining.length,
+          spokenStart: spokenText.length,
+          spokenLength: remaining.length,
+          isModified: false
+      });
+      spokenText += remaining;
+  }
+
+  // Si aucun segment (texte vide ou sans date), on crée un segment par défaut
+  if (segments.length === 0 && text.length > 0) {
+      return { spokenText: text, segments: [{ originalStart: 0, originalLength: text.length, spokenStart: 0, spokenLength: text.length, isModified: false }] };
+  }
+
+  return { spokenText: spokenText || text, segments };
+};
+
 export default function Karaoke() {
   const [isActive, setIsActive] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,9 +139,18 @@ export default function Karaoke() {
   // Identifier les blocs de texte
   useEffect(() => {
     if (isActive) {
-      const container = document.getElementById('doc-container') || document.querySelector('.markdown-content');
+      // Détecter le conteneur visible
+      let container = document.getElementById('doc-container');
+      const mobileContainer = document.getElementById('mobile-reader');
+      
+      // Vérifier si le conteneur mobile est visible (display block ou flex)
+      if (mobileContainer && window.getComputedStyle(mobileContainer).display !== 'none') {
+        container = mobileContainer;
+      }
+      
       if (container) {
         // Sélectionner les éléments de texte significatifs
+        // Note: Sur mobile, cela sélectionnera tous les éléments de toutes les pages chargées
         const elements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, blockquote');
         blocksRef.current = Array.from(elements) as HTMLElement[];
       }
@@ -68,37 +182,51 @@ export default function Karaoke() {
   };
 
   const highlightWord = (block: HTMLElement, charIndex: number, charLength: number) => {
-    // Cette méthode est complexe car elle nécessite de modifier le DOM sans casser la lecture
-    // Une approche plus simple pour le MVP est de surligner tout le bloc
-    // Ou d'utiliser Selection API qui est visuelle mais ne modifie pas le DOM
-    
-    // Approche Selection API (moins intrusive)
     const textNodes = getTextNodes(block);
     let currentLength = 0;
+    let startNode: Node | null = null;
+    let startOffset = 0;
+    let endNode: Node | null = null;
+    let endOffset = 0;
     
+    // Find start
     for (const node of textNodes) {
       const nodeLength = node.textContent?.length || 0;
       if (currentLength + nodeLength > charIndex) {
-        const start = charIndex - currentLength;
-        const end = Math.min(start + charLength, nodeLength);
-        
-        if (start >= 0 && end <= nodeLength) {
-          const range = document.createRange();
-          range.setStart(node, start);
-          range.setEnd(node, end);
-          
-          const selection = window.getSelection();
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-          
-          // Scroll vers le mot si nécessaire
-          if (node.parentElement) {
-             node.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }
+        startNode = node;
+        startOffset = charIndex - currentLength;
         break;
       }
       currentLength += nodeLength;
+    }
+
+    if (!startNode) return;
+
+    // Find end
+    const endIndex = charIndex + charLength;
+    currentLength = 0;
+    for (const node of textNodes) {
+      const nodeLength = node.textContent?.length || 0;
+      if (currentLength + nodeLength >= endIndex) {
+        endNode = node;
+        endOffset = endIndex - currentLength;
+        break;
+      }
+      currentLength += nodeLength;
+    }
+
+    if (startNode && endNode) {
+        const range = document.createRange();
+        range.setStart(startNode, startOffset);
+        range.setEnd(endNode, endOffset);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        
+        // Scroll vers le mot si nécessaire (optionnel, peut être distrayant)
+        // if (startNode.parentElement) {
+        //    startNode.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // }
     }
   };
 
@@ -128,8 +256,11 @@ export default function Karaoke() {
     block.classList.add('karaoke-active-block');
     block.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    const text = block.textContent || '';
-    const utterance = new SpeechSynthesisUtterance(text);
+    const originalText = block.textContent || '';
+    // Préparer le texte pour la lecture (normalisation des dates)
+    const { spokenText, segments } = prepareTextForSpeech(originalText);
+
+    const utterance = new SpeechSynthesisUtterance(spokenText);
     
     if (selectedVoice) utterance.voice = selectedVoice;
     utterance.rate = rate;
@@ -137,13 +268,32 @@ export default function Karaoke() {
 
     utterance.onboundary = (event) => {
       if (event.name === 'word') {
-        // On essaie de deviner la longueur du mot car l'event ne la donne pas toujours
-        // On prend jusqu'au prochain espace
         const wordStart = event.charIndex;
-        const nextSpace = text.indexOf(' ', wordStart);
-        const wordLength = nextSpace === -1 ? text.length - wordStart : nextSpace - wordStart;
+        // Trouver la longueur du mot dans le texte parlé
+        const nextSpace = spokenText.indexOf(' ', wordStart);
+        const wordLength = nextSpace === -1 ? spokenText.length - wordStart : nextSpace - wordStart;
         
-        highlightWord(block, wordStart, wordLength);
+        // Mapper vers le texte original
+        let originalIndex = wordStart;
+        let originalLen = wordLength;
+
+        // Trouver le segment correspondant
+        for (const seg of segments) {
+          if (wordStart >= seg.spokenStart && wordStart < seg.spokenStart + seg.spokenLength) {
+            if (seg.isModified) {
+              // Si c'est une date modifiée, on surligne toute la date originale
+              originalIndex = seg.originalStart;
+              originalLen = seg.originalLength;
+            } else {
+              // Mapping linéaire pour le texte normal
+              originalIndex = seg.originalStart + (wordStart - seg.spokenStart);
+              // La longueur reste la même
+            }
+            break;
+          }
+        }
+        
+        highlightWord(block, originalIndex, originalLen);
       }
     };
 
