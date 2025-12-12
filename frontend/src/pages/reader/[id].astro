@@ -43,7 +43,7 @@ const processor = unified()
   .use(remarkRehype, { allowDangerousHtml: true }) // Convert to HTML AST
   .use(rehypeKatex) // Render math with KaTeX
   .use(rehypeMermaid, {
-    strategy: "inline-svg", // Génère du SVG inline
+    strategy: "inline-svg",
     dark: false,
     mermaidConfig: {
       theme: "default",
