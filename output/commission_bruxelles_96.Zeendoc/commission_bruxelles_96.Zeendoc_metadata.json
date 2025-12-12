@@ -1,0 +1,20 @@
+{
+  "source_file": "ressources/commission_bruxelles_96.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 1,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Compte Rendu Intégral de la Séance du 20 Octobre 1995\",\n  \"document_type\": \"procès-verbal\",\n  \"summary\": \"Le document est le compte rendu intégral de la séance du 20 octobre 1995 de l'Assemblée de la Commission Communautaire Française. La séance commence à 9h50 avec la présidence de M. Désir. Les points clés incluent l'approbation de l'ordre du jour, la nomination du Bureau, l'allocution du Président, la constitution de l'Assemblée, le dépôt de propositions, des questions écrites, des arrêts de réallocations, des communications, des notifications, et la clôture de la séance. Plusieurs interventions et discussions ont eu lieu, notamment sur des questions budgétaires et des propositions de décret.\",\n  \"key_points\": [\n    \"Approbation de l'ordre du jour\",\n    \"Nomination du Bureau\",\n    \"Allocution du Président\",\n    \"Constitution de l'Assemblée\",\n    \"Dépôt de propositions\",\n    \"Questions écrites\",\n    \"Arrêts de réallocations\",\n    \"Communications\",\n    \"Notifications\",\n    \"Clôture de la séance\"\n  ],\n  \"authors\": [\n    \"M. Désir\",\n    \"M. Hervé Hasquin\",\n    \"M. Georges Matagne\",\n    \"M. Dominique Harmel\",\n    \"M. Jacques De Coster\",\n    \"M. André Drouart\",\n    \"M. Denis Grimberghs\"\n  ],\n  \"date\": \"20 octobre 1995\",\n  \"organizations\": [\n    \"Assemblée de la Commission Communautaire Française\",\n    \"Conseil régional\",\n    \"COCOF\",\n    \"COCON\",\n    \"Vlaamse Raad\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 719,
+        "top_left_y": 142,
+        "bottom_right_x": 876,
+        "bottom_right_y": 367
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Logo de l'Assemblée des Bruxelles\",\n  \"short_description\": \"Logo de l'Assemblée des Bruxelles\",\n  \"detailed_description\": \"Le logo de l'Assemblée des Bruxelles est composé de deux fleurs et deux oiseaux stylisés dans des cases noires et blanches. Le texte 'ASSEMBLEE BRUXELLES' est écrit verticalement à gauche du logo.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<!-- 
+  Add this to your ReaderLayout.astro or Layout.astro file
+  to support daltonism filters globally across all pages
+-->
+
+<!-- Add inside <head> or at the top of <body> -->
+<svg style="width:0; height:0; position: absolute; visibility: hidden;">
+  <defs>
+    <!-- Protanopia Filter (Red color blindness) -->
+    <filter id="protanopia">
+      <feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0
+                                           0.558, 0.442, 0, 0, 0
+                                           0, 0.242, 0.758, 0, 0
+                                           0, 0, 0, 1, 0" />
+    </filter>
+    
+    <!-- Deuteranopia Filter (Green color blindness) -->
+    <filter id="deuteranopia">
+      <feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0
+                                           0.7, 0.3, 0, 0, 0
+                                           0, 0.3, 0.7, 0, 0
+                                           0, 0, 0, 1, 0" />
+    </filter>
+    
+    <!-- Tritanopia Filter (Blue color blindness) -->
+    <filter id="tritanopia">
+      <feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0
+                                           0, 0.433, 0.567, 0, 0
+                                           0, 0.475, 0.525, 0, 0
+                                           0, 0, 0, 1, 0" />
+    </filter>
+  </defs>
+</svg>
+
+<!-- Add in <style is:global> section -->
+<style is:global>
+  /* Daltonism Filters - Apply to images */
+  body.daltonism-protanopia img { 
+    filter: url('#protanopia'); 
+  }
+  
+  body.daltonism-deuteranopia img { 
+    filter: url('#deuteranopia'); 
+  }
+  
+  body.daltonism-tritanopia img { 
+    filter: url('#tritanopia'); 
+  }
+  
+  body.daltonism-monochromatism img { 
+    filter: grayscale(100%); 
+  }
+
+  /* Optional: Apply to entire page content if needed */
+  body.daltonism-protanopia .markdown-content { 
+    filter: url('#protanopia'); 
+  }
+  
+  body.daltonism-deuteranopia .markdown-content { 
+    filter: url('#deuteranopia'); 
+  }
+  
+  body.daltonism-tritanopia .markdown-content { 
+    filter: url('#tritanopia'); 
+  }
+  
+  body.daltonism-monochromatism .markdown-content { 
+    filter: grayscale(100%); 
+  }
+
+  /* Smooth transition when applying filters */
+  img, .markdown-content {
+    transition: filter 0.3s ease;
+  }
+</style>
+
+<!-- Add JavaScript to persist and load daltonism preference -->
+<script>
+  // Load daltonism preference from localStorage
+  function loadDaltonismPreference() {
+    const savedDaltonism = localStorage.getItem('reader_daltonism') || 'normal';
+    applyDaltonism(savedDaltonism);
+    console.log('[Daltonism] Loaded preference:', savedDaltonism);
+  }
+
+  // Apply daltonism filter
+  function applyDaltonism(mode: string) {
+    const body = document.body;
+    body.classList.remove(
+      'daltonism-protanopia', 
+      'daltonism-deuteranopia', 
+      'daltonism-tritanopia', 
+      'daltonism-monochromatism'
+    );
+    
+    if (mode !== 'normal' && mode !== 'Aucun') {
+      const filterMap = {
+        'Protanopie': 'protanopia',
+        'Deutéranopie': 'deuteranopia',
+        'Tritanopie': 'tritanopia',
+        'Monochromatisme': 'monochromatism',
+        // Legacy support
+        'protanopia': 'protanopia',
+        'deuteranopia': 'deuteranopia',
+        'tritanopia': 'tritanopia',
+        'monochromatism': 'monochromatism'
+      };
+      
+      const filterClass = filterMap[mode];
+      if (filterClass) {
+        body.classList.add(`daltonism-${filterClass}`);
+        console.log('[Daltonism] Applied filter:', filterClass);
+      }
+    }
+  }
+
+  // Listen for storage changes (when changed in another tab/component)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'reader_daltonism') {
+      console.log('[Daltonism] Storage changed:', e.newValue);
+      applyDaltonism(e.newValue || 'normal');
+    }
+  });
+
+  // Load on page load
+  loadDaltonismPreference();
+</script>
+
+<!--
+  INTEGRATION EXAMPLE for ReaderLayout.astro:
+  
+  1. Add the SVG filters right after <body> tag
+  2. Add the styles in the existing <style is:global> section
+  3. Add the script before closing </body> tag
+  
+  This will ensure daltonism filters work across all pages
+  and persist between page navigations.
+-->

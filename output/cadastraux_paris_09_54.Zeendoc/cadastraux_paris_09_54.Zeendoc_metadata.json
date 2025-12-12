@@ -1,0 +1,20 @@
+{
+  "source_file": "ressources/cadastraux_paris_09_54.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 1,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Plans cadastraux de Paris 1809-1854\",\n  \"document_type\": \"Répertoire numérique détaillé\",\n  \"summary\": \"Le document présente un répertoire numérique détaillé des plans cadastraux de Paris couvrant la période de 1809 à 1854. Il inclut des informations sur les auteurs, les dates, les organisations impliquées, et les méthodes de numérisation et de conservation des plans. Le document est conforme aux normes ISAD(G) et DTD EAD, et est disponible en ligne via les Archives nationales de France.\",\n  \"key_points\": [\n    \"Plans cadastraux de Paris de 1809 à 1854\",\n    \"Répertoire numérique détaillé des documents de la sous-série F/31\",\n    \"Auteur : Aurélie Peylhard, Mission Cartes et Plans\",\n    \"Conforme aux normes ISAD(G) et DTD EAD\",\n    \"Disponible en ligne via les Archives nationales de France\",\n    \"Inclut des informations sur les méthodes de numérisation et de conservation\",\n    \"26 200 plans conservés aux Archives nationales\",\n    \"Plans réalisés dans le cadre du cadastre parcellaire napoléonien\",\n    \"Microfilms et numérisations disponibles\",\n    \"Informations complémentaires sur les rues, les numéros de rue, et les propriétaires\"\n  ],\n  \"authors\": [\n    \"Aurélie Peylhard\"\n  ],\n  \"date\": \"2021\",\n  \"organizations\": [\n    \"Archives nationales (France)\",\n    \"Mission Cartes et Plans\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 639,
+        "top_left_y": 95,
+        "bottom_right_x": 1016,
+        "bottom_right_y": 266
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Archives Nationales\",\n  \"short_description\": \"Logo des Archives Nationales\",\n  \"detailed_description\": \"Le logo des Archives Nationales est composé de la lettre 'A' stylisée en forme de bâtiment, suivie du texte 'Archives Nationales' avec des couleurs distinctes pour chaque mot. Le mot 'Archives' est en bleu et le mot 'Nationales' est en bleu plus foncé.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

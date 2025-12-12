@@ -1,0 +1,129 @@
+---
+---
+
+<section class="hero">
+    <div class="video-container">
+        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="overlay"></div>
+    </div>
+
+    <div class="content container">
+        <h1>Voyages</h1>
+        <p class="subtitle">Découvrez les coins cachés du monde.</p>
+        
+        <div class="scroll-indicator">
+            <span>Défilez pour explorer</span>
+            <div class="line"></div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: white;
+    }
+
+    .video-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3); /* Darken video slightly for text readability */
+    }
+
+    .content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1 {
+        font-size: clamp(4rem, 15vw, 12rem);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeUp 1s ease forwards 0.5s;
+    }
+
+    .subtitle {
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        font-weight: 400;
+        opacity: 0;
+        animation: fadeUp 1s ease forwards 0.8s;
+        max-width: 600px;
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.7;
+    }
+
+    .line {
+        width: 1px;
+        height: 60px;
+        background: white;
+        animation: scrollLine 2s infinite;
+        transform-origin: top;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scrollLine {
+        0% { transform: scaleY(0); }
+        50% { transform: scaleY(1); }
+        100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+</style>

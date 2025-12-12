@@ -1,0 +1,20 @@
+{
+  "source_file": "ressources/exportIr.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 1,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Répertoire alphabétique des dossiers conservés dans les versements 19940432 à 19940492\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Ce document est un répertoire alphabétique des dossiers individuels conservés dans les versements 19940432 à 19940492 de la Direction générale de Sûreté nationale. Il couvre la période de la fin du XIXe siècle à 1940 et a été compilé par Emilie Charrier, chargée d'études documentaires. Le document est une édition électronique des Archives nationales de France, située à Pierrefitte-sur-Seine. Il est conforme à la norme ISAD(G) et aux règles d'application de la DTD EAD (version 2002).\",\n  \"key_points\": [\n    \"Répertoire alphabétique des dossiers individuels de la Direction générale de Sûreté nationale.\",\n    \"Période couverte: fin du XIXe siècle à 1940.\",\n    \"Compilé par Emilie Charrier.\",\n    \"Édition électronique des Archives nationales de France.\",\n    \"Conforme à la norme ISAD(G) et aux règles d'application de la DTD EAD (version 2002).\",\n    \"Disponible en ligne et accessible via des microfilms.\"\n  ],\n  \"authors\": [\n    \"Emilie Charrier\"\n  ],\n  \"date\": \"2014\",\n  \"organizations\": [\n    \"Archives nationales (France)\",\n    \"Direction générale de Sûreté nationale\"\n  ]\n}",
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 639,
+        "top_left_y": 102,
+        "bottom_right_x": 1016,
+        "bottom_right_y": 271
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Archives Nationales\",\n  \"short_description\": \"Logo des Archives Nationales\",\n  \"detailed_description\": \"Le logo des Archives Nationales est composé des mots 'Archives Nationales' avec une mise en page distinctive. Le mot 'Archives' est en doré, tandis que les mots 'Nationales' sont en bleu. Les lettres sont disposées de manière à former un rectangle avec des espaces entre les lettres.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+---
+source_file: exportIr.Zeendoc.pdf
+page_number: 4
+total_pages: 8
+total_images: 0
+document_title: Répertoire alphabétique des dossiers conservés dans les versements
+  19940432 à 19940492
+language: fr
+document_type: rapport
+---
+
+# INTRODUCTION 
+
+## Référence
+
+19940432/1-19940432/290,19940433/1-19940433/6,19940434/1-19940434/704,19940435/1-
+19940435/16,19940436/1-19940436/2,19940437/1-19940437/449,19940438/1-
+19940438/12,19940439/1,19940440/1-19940440/405,19940441/1-19940441/14,19940442/1-
+19940442/5,19940443/1-19940443/91,19940444/1-19940444/2,19940445/1-19940445/298,19940446/1-
+19940446/9,19940447/1-19940447/5,19940448/1-19940448/509,19940449/1-19940449/8,19940450/1-
+19940450/4,19940451/1-19940451/255,19940452/1-19940452/6,19940453/1-
+19940453/40,19940454/1,19940455/1-19940455/117,19940456/1-19940456/2,19940457/1-
+19940457/309,19940458/1-19940458/6,19940459/1-19940459/415,19940460/1-
+19940460/5,19940461/1,19940462/1-19940462/591,19940463/1-19940463/16,19940464/1-
+19940464/122,19940465/1-19940465/8,19940466/1-19940466/91,19940467/1-
+19940467/3,19940468/1,19940469/1-19940469/429,19940470/1-19940470/7,19940471/1,19940472/1-
+19940472/343,19940473/1-19940473/4,19940474/1-19940474/521,19940475/1-19940475/32,19940476/1-
+19940476/4,19940477/1-19940477/180,19940478/1-19940478/13,19940479/1-19940479/2,19940480/1-
+19940480/21,19940481/1,19940482/1-19940482/187,19940483/1-19940483/3,19940484/1-
+19940484/155,19940485/1-19940485/7,19940486/1-19940486/17,19940487/1,19940488/1-
+19940488/92,19940489/1,19940490/1-19940490/13,19940491/1,19940492/1-19940492/2
+
+Niveau de description
+fonds
+
+## Intitulé
+
+Intérieur ; Direction générale de Sûreté nationale. Fichier central de la Sûreté nationale : dossiers individuels (fin
+XIXe-1940)
+Date(s) extrême(s)
+1870-1940
+
+## Nom du producteur
+
+- France. Ministère de l'Intérieur. Direction de la Sûreté nationale (1876-1966)
+- France. Ministère de l'Intérieur. Direction générale de la Sûreté nationale. Fichier central (1934-1940)
+
+Importance matérielle et support
+1750 articles, 600000 dossiers
+
+Localisation physique
+Pierrefitte-sur-Seine
+
+## Conditions d'accès
+
+Librement communicable.
+
+## Conditions d'utilisation
+
+Selon le règlement de la salle de lecture des Archives nationales.
+
+## DESCRIPTION
+
+## Présentation du contenu
+
+Le présent instrument de recherche permet l'accès aux répertoires alphabétiques inventoriant les milliers de dossiers composant le Fichier central de la Sûreté nationale en 1940.
