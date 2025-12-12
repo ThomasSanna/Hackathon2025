@@ -1,0 +1,17 @@
+{
+  "source_file": "rapport_mindlet.pdf",
+  "total_pages": 8,
+  "total_images": 0,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Cahier des charges pour l'application Mindlet\",\n  \"document_type\": \"rapport\",\n  \"summary\": \"Le document présente une analyse détaillée de l'application Mindlet, une plateforme d'apprentissage collaborative et innovante. Il décrit les fonctionnalités clés de Mindlet, telles que la création de collections de flashcards, l'utilisation de quiz et de jeux de correspondance pour stimuler différentes fonctions cérébrales, et l'intégration de l'intelligence artificielle pour personnaliser l'expérience d'apprentissage. Le document met également en avant l'approche neurosciencifique et pédagogique de Mindlet, qui vise à maximiser l'impact pédagogique en activant la mémoire de travail, la mémoire à long terme et la mémoire visuelle. De plus, il aborde les objectifs du projet, y compris le développement d'une plateforme multiplateforme, l'intégration de l'intelligence artificielle pour améliorer l'adaptabilité de l'apprentissage, et l'optimisation de l'interface utilisateur pour garantir une expérience intuitive et agréable. Le document se conclut par une analyse SWOT de Mindlet, mettant en évidence ses forces, telles que l'innovation technologique et l'approche collaborative, ainsi que ses faiblesses, comme la notoriété faible à ce jour et la dépendance au contenu utilisateur.\",\n  \"key_points\": [\n    \"Mindlet est une application d'apprentissage collaborative et innovante qui combine des technologies d'intelligence artificielle avancées avec des fonctionnalités sociales.\",\n    \"Les utilisateurs peuvent créer des collections de flashcards, participer à des quiz et jouer à des jeux de correspondance pour stimuler différentes fonctions cérébrales.\",\n    \"Mindlet utilise une approche neurosciencifique et pédagogique pour maximiser l'impact pédagogique.\",\n    \"Les objectifs du projet incluent le développement d'une plateforme multiplateforme, l'intégration de l'intelligence artificielle pour personnaliser l'expérience d'apprentissage, et l'optimisation de l'interface utilisateur.\",\n    \"L'analyse SWOT de Mindlet met en évidence ses forces, telles que l'innovation technologique et l'approche collaborative, ainsi que ses faiblesses, comme la notoriété faible à ce jour et la dépendance au contenu utilisateur.\"\n  ],\n  \"authors\": [\n    \"Anthony Menghi\",\n    \"Mehdi Ghoulam\"\n  ],\n  \"date\": \"04/11/2024\",\n  \"organizations\": [\n    \"Universita di Corsica\",\n    \"Faculté Sciences et Techniques\"\n  ]\n}",
+  "markdown_files": [
+    "page_1.md",
+    "page_2.md",
+    "page_3.md",
+    "page_4.md",
+    "page_5.md",
+    "page_6.md",
+    "page_7.md",
+    "page_8.md"
+  ],
+  "images": []
+}

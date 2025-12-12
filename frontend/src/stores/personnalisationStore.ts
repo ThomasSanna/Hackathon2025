@@ -479,3 +479,12 @@ export const useOutils = () =>
     barre_progression: state.barre_progression,
     regle_lecture: state.regle_lecture,
   }));
+
+// Synchronisation entre les onglets
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === "personnalisation-storage") {
+      usePersonnalisationStore.persist.rehydrate();
+    }
+  });
+}
