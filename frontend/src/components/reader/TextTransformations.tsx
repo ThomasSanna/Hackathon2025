@@ -88,6 +88,8 @@ export default function TextTransformations() {
           !segmentation_syllabique &&
           !phonemes_actifs &&
           !dyslexie.lettres_muettes &&
+          !dyslexie.alternement_typo &&
+          !dyslexie.soulignement_syllabes &&
           !semantique.nom_propre &&
           !semantique.date_chiffre &&
           !semantique.mot_long

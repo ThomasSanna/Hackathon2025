@@ -58,6 +58,7 @@ export default function ReaderStyleProvider() {
 
     // Police
     root.style.setProperty("--font-body", font);
+    root.style.setProperty("--font-heading", font);
 
     // === THÈME ===
     root.style.setProperty("--bg-color", theme.couleur_fond);
