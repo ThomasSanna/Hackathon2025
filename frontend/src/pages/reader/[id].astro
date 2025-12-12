@@ -90,6 +90,9 @@ export async function getStaticPaths() {
   const pagesByDoc: Record<string, MarkdownInstance<Frontmatter>[]> = {};
 
   allPages.forEach((page) => {
+    // Exclure les fichiers mind_map
+    if (page.file.includes("mind_map")) return;
+
     // Le chemin du fichier est dans page.file
     // Exemple: .../src/pages/output_2/23248.Zeendoc/page_1.md
     // Gestion des séparateurs de chemin Windows/Unix
@@ -134,6 +137,10 @@ interface Props {
 
 const { pages, docId } = Astro.props;
 const title = pages[0]?.frontmatter?.document_title || docId;
+
+// Vérification de l'existence de la mindmap
+const mindMapPath = `src/pages/output_2/${docId}/mind_map/mind_map.md`;
+const hasMindMap = fs.existsSync(mindMapPath);
 
 // Fusion du contenu
 let fullMarkdown = "";
@@ -205,7 +212,7 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
   <!-- Composant React pour appliquer les styles dynamiques depuis le store Zustand -->
   <ReaderStyleProvider client:load />
 
-  <ReaderNavbar backUrl="/library" />
+  <ReaderNavbar backUrl="/library" docId={docId} hasMindMap={hasMindMap} />
   <TableOfContents />
   <InfoPanel client:load frontmatter={currentFrontmatter} />
 

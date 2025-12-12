@@ -1,0 +1,151 @@
+---
+import ReaderLayout from "../../../layouts/ReaderLayout.astro";
+import type { MarkdownInstance } from "astro";
+import fs from "node:fs";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import rehypeMermaid from "rehype-mermaid";
+
+// Configuration du processeur Markdown pour la Mindmap
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeMermaid, {
+    strategy: "inline-svg",
+    dark: false,
+    mermaidConfig: {
+      theme: "default",
+      securityLevel: "loose",
+    },
+  })
+  .use(rehypeStringify, { allowDangerousHtml: true });
+
+async function parseMarkdown(content: string): Promise<string> {
+  const file = await processor.process(content);
+  return String(file);
+}
+
+export interface Frontmatter {
+  document_title?: string;
+}
+
+export async function getStaticPaths() {
+  // Récupère tous les fichiers mind_map.md
+  const allMindMaps = await Astro.glob<Frontmatter>(
+    "../../output_2/**/mind_map/mind_map.md"
+  );
+
+  return allMindMaps
+    .map((page) => {
+      // Extraction de l'ID du document depuis le chemin du fichier
+      // .../output_2/[docId]/mind_map/mind_map.md
+      const parts = page.file.split(/[/\\]/);
+      const outputIndex = parts.indexOf("output_2");
+
+      if (outputIndex !== -1 && parts.length > outputIndex + 1) {
+        const docId = parts[outputIndex + 1];
+        return {
+          params: { id: docId },
+          props: { page, docId },
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
+interface Props {
+  page: MarkdownInstance<Frontmatter>;
+  docId: string;
+}
+
+const { page, docId } = Astro.props;
+const title = "Carte Mentale - " + (page.frontmatter?.document_title || docId);
+
+// Lecture et conversion du contenu
+const content = fs.readFileSync(page.file, "utf-8");
+// Suppression du frontmatter si présent
+const parts = content.split("---");
+const rawBody = parts.length >= 3 ? parts.slice(2).join("---").trim() : content;
+
+const contentHtml = await parseMarkdown(rawBody);
+---
+
+<ReaderLayout frontmatter={{ title: title }}>
+  <div class="mindmap-container">
+    <div class="navbar">
+      <a href={`/reader/${docId}`} class="back-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg
+        >
+        Retour au document
+      </a>
+      <h1>Carte Mentale</h1>
+    </div>
+
+    <div class="content" set:html={contentHtml} />
+  </div>
+</ReaderLayout>
+
+<style>
+  .mindmap-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s;
+  }
+
+  .back-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+  }
+
+  /* Centrer le diagramme mermaid */
+  .content :global(.mermaid) {
+    display: flex;
+    justify-content: center;
+  }
+</style>
