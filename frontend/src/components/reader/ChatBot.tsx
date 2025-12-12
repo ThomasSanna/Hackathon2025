@@ -107,169 +107,172 @@ export default function ChatBot({ docId }: ChatBotProps) {
       </button>
 
       {/* Modal du chat */}
-      {isOpen && createPortal(
-        <div className="chatbot-overlay" onClick={() => setIsOpen(false)}>
-          <div className="chatbot-modal" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="chatbot-header">
-              <div className="chatbot-header-info">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4" />
-                  <path d="M12 8h.01" />
-                </svg>
-                <span>Assistant Document IA</span>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="chatbot-close"
-                aria-label="Fermer"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Messages */}
-            <div className="chatbot-messages">
-              {messages.length === 0 && (
-                <div className="chatbot-welcome">
+      {isOpen &&
+        createPortal(
+          <div className="chatbot-overlay" onClick={() => setIsOpen(false)}>
+            <div className="chatbot-modal" onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="chatbot-header">
+                <div className="chatbot-header-info">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.5"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4" />
+                    <path d="M12 8h.01" />
                   </svg>
-                  <h3>Posez une question sur ce document</h3>
-                  <p>
-                    L'assistant IA peut vous aider à comprendre, résumer ou
-                    analyser le contenu de ce document.
-                  </p>
-                  <div className="chatbot-suggestions">
-                    <button
-                      onClick={() => {
-                        setInput("Peux-tu me résumer ce document ?");
-                      }}
-                    >
-                      📝 Résumer le document
-                    </button>
-                    <button
-                      onClick={() => {
-                        setInput("Quels sont les points clés de ce document ?");
-                      }}
-                    >
-                      🎯 Points clés
-                    </button>
-                    <button
-                      onClick={() => {
-                        setInput("De quoi parle ce document ?");
-                      }}
-                    >
-                      ❓ Sujet du document
-                    </button>
-                  </div>
+                  <span>Assistant Document IA</span>
                 </div>
-              )}
-
-              {messages.map((msg, index) => (
-                <div key={index} className={`chatbot-message ${msg.role}`}>
-                  <div className="message-avatar">
-                    {msg.role === "user" ? "👤" : "🤖"}
-                  </div>
-                  {msg.role === "assistant" ? (
-                    <div
-                      className="message-content markdown-content"
-                      dangerouslySetInnerHTML={{
-                        __html: marked.parse(msg.content) as string,
-                      }}
-                    />
-                  ) : (
-                    <div className="message-content">{msg.content}</div>
-                  )}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="chatbot-message assistant">
-                  <div className="message-avatar">🤖</div>
-                  <div className="message-content loading">
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                  </div>
-                </div>
-              )}
-
-              {error && <div className="chatbot-error">{error}</div>}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="chatbot-input-container">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Posez votre question..."
-                disabled={isLoading}
-                rows={1}
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
-                className="chatbot-send"
-                aria-label="Envoyer"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="chatbot-close"
+                  aria-label="Fermer"
                 >
-                  <line x1="22" y1="2" x2="11" y2="13" />
-                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Messages */}
+              <div className="chatbot-messages">
+                {messages.length === 0 && (
+                  <div className="chatbot-welcome">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <h3>Posez une question sur ce document</h3>
+                    <p>
+                      L'assistant IA peut vous aider à comprendre, résumer ou
+                      analyser le contenu de ce document.
+                    </p>
+                    <div className="chatbot-suggestions">
+                      <button
+                        onClick={() => {
+                          setInput("Peux-tu me résumer ce document ?");
+                        }}
+                      >
+                        📝 Résumer le document
+                      </button>
+                      <button
+                        onClick={() => {
+                          setInput(
+                            "Quels sont les points clés de ce document ?"
+                          );
+                        }}
+                      >
+                        🎯 Points clés
+                      </button>
+                      <button
+                        onClick={() => {
+                          setInput("De quoi parle ce document ?");
+                        }}
+                      >
+                        ❓ Sujet du document
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {messages.map((msg, index) => (
+                  <div key={index} className={`chatbot-message ${msg.role}`}>
+                    <div className="message-avatar">
+                      {msg.role === "user" ? "👤" : "🤖"}
+                    </div>
+                    {msg.role === "assistant" ? (
+                      <div
+                        className="message-content markdown-content"
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(msg.content) as string,
+                        }}
+                      />
+                    ) : (
+                      <div className="message-content">{msg.content}</div>
+                    )}
+                  </div>
+                ))}
+
+                {isLoading && (
+                  <div className="chatbot-message assistant">
+                    <div className="message-avatar">🤖</div>
+                    <div className="message-content loading">
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                    </div>
+                  </div>
+                )}
+
+                {error && <div className="chatbot-error">{error}</div>}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="chatbot-input-container">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Posez votre question..."
+                  disabled={isLoading}
+                  rows={1}
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim() || isLoading}
+                  className="chatbot-send"
+                  aria-label="Envoyer"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
 
       <style>{`
         .chatbot-toggle {

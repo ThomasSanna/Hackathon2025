@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ImageDetailsData {
   src: string;
@@ -17,16 +17,22 @@ export default function ImageDetails() {
       setIsOpen(true);
     };
 
-    window.addEventListener('open-image-details' as any, handleOpen);
-    return () => window.removeEventListener('open-image-details' as any, handleOpen);
+    window.addEventListener("open-image-details" as any, handleOpen);
+    return () =>
+      window.removeEventListener("open-image-details" as any, handleOpen);
   }, []);
 
   if (!isOpen || !data) return null;
 
   return createPortal(
     <div className="image-details-overlay" onClick={() => setIsOpen(false)}>
-      <div className="image-details-modal" onClick={e => e.stopPropagation()}>
-        <button className="image-details-close" onClick={() => setIsOpen(false)}>✕</button>
+      <div className="image-details-modal" onClick={(e) => e.stopPropagation()}>
+        <button
+          className="image-details-close"
+          onClick={() => setIsOpen(false)}
+        >
+          ✕
+        </button>
         <div className="image-details-content">
           <div className="image-container">
             <img src={data.src} alt={data.alt} />
@@ -35,9 +41,9 @@ export default function ImageDetails() {
             <h3>Description de l'image</h3>
             <div className="image-description">
               {data.description ? (
-                data.description.split('\n').map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
-                ))
+                data.description
+                  .split("\n")
+                  .map((paragraph, i) => <p key={i}>{paragraph}</p>)
               ) : (
                 <p>{data.alt || "Aucune description disponible."}</p>
               )}

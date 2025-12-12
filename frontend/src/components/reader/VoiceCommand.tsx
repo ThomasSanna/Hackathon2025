@@ -90,18 +90,22 @@ export default function VoiceCommand() {
   // Appliquer la config reçue du backend au store
   const applyConfigToStore = (config: any) => {
     console.log("🔄 Application de la config reçue:", config);
-    
+
     // Récupérer le state actuel et les setters
     const store = usePersonnalisationStore.getState();
-    
+
     // Typographie
     if (config.espace_mot !== undefined) store.setEspaceMot(config.espace_mot);
-    if (config.espace_lettre !== undefined) store.setEspaceLettre(config.espace_lettre);
+    if (config.espace_lettre !== undefined)
+      store.setEspaceLettre(config.espace_lettre);
     if (config.font !== undefined) store.setFont(config.font);
     if (config.interligne !== undefined) store.setInterligne(config.interligne);
-    if (config.alignement_texte !== undefined) store.setAlignementTexte(config.alignement_texte);
-    if (config.longueur_liseuse !== undefined) store.setLongueurLiseuse(config.longueur_liseuse);
-    if (config.taille_texte !== undefined) store.setTailleTexte(config.taille_texte);
+    if (config.alignement_texte !== undefined)
+      store.setAlignementTexte(config.alignement_texte);
+    if (config.longueur_liseuse !== undefined)
+      store.setLongueurLiseuse(config.longueur_liseuse);
+    if (config.taille_texte !== undefined)
+      store.setTailleTexte(config.taille_texte);
 
     // Thème - IMPORTANT: appliquer le theme_mode pour déclencher le changement complet
     if (config.theme_mode !== undefined) {
@@ -114,57 +118,74 @@ export default function VoiceCommand() {
         console.warn("⚠️ theme_mode invalide:", config.theme_mode);
       }
     }
-    
+
     // Thème - Couleurs individuelles (appliquées après theme_mode ou seules)
     if (config.theme) {
-      if (config.theme.couleur_fond) store.setThemeCouleurFond(config.theme.couleur_fond);
-      if (config.theme.couleur_texte) store.setThemeCouleurTexte(config.theme.couleur_texte);
-      if (config.theme.couleur_surlignage) store.setThemeCouleurSurlignage(config.theme.couleur_surlignage);
+      if (config.theme.couleur_fond)
+        store.setThemeCouleurFond(config.theme.couleur_fond);
+      if (config.theme.couleur_texte)
+        store.setThemeCouleurTexte(config.theme.couleur_texte);
+      if (config.theme.couleur_surlignage)
+        store.setThemeCouleurSurlignage(config.theme.couleur_surlignage);
     }
 
     // Dyslexie
-    if (config.segmentation_syllabique !== undefined) store.setSegmentationSyllabique(config.segmentation_syllabique);
-    if (config.phonemes_actifs !== undefined) store.setPhonemesActifs(config.phonemes_actifs);
-    
+    if (config.segmentation_syllabique !== undefined)
+      store.setSegmentationSyllabique(config.segmentation_syllabique);
+    if (config.phonemes_actifs !== undefined)
+      store.setPhonemesActifs(config.phonemes_actifs);
+
     if (config.dyslexie) {
-      if (config.dyslexie.alternement_typo !== undefined) store.setAlternementTypo(config.dyslexie.alternement_typo);
-      if (config.dyslexie.soulignement_syllabes !== undefined) store.setSoulignementSyllabes(config.dyslexie.soulignement_syllabes);
-      if (config.dyslexie.lettres_muettes !== undefined) store.setLettresMuettes(config.dyslexie.lettres_muettes);
+      if (config.dyslexie.alternement_typo !== undefined)
+        store.setAlternementTypo(config.dyslexie.alternement_typo);
+      if (config.dyslexie.soulignement_syllabes !== undefined)
+        store.setSoulignementSyllabes(config.dyslexie.soulignement_syllabes);
+      if (config.dyslexie.lettres_muettes !== undefined)
+        store.setLettresMuettes(config.dyslexie.lettres_muettes);
 
       // Phonèmes
       if (config.dyslexie.phonemes) {
         const currentPhonemes = store.dyslexie.phonemes;
-        Object.entries(config.dyslexie.phonemes).forEach(([key, phoneme]: [string, any]) => {
-          if (phoneme.actif !== undefined) {
-            const currentPhoneme = currentPhonemes[key];
-            if (currentPhoneme && currentPhoneme.actif !== phoneme.actif) {
-              store.togglePhoneme(key);
+        Object.entries(config.dyslexie.phonemes).forEach(
+          ([key, phoneme]: [string, any]) => {
+            if (phoneme.actif !== undefined) {
+              const currentPhoneme = currentPhonemes[key];
+              if (currentPhoneme && currentPhoneme.actif !== phoneme.actif) {
+                store.togglePhoneme(key);
+              }
+            }
+            if (phoneme.couleur !== undefined) {
+              store.setPhonemeColor(key, phoneme.couleur);
             }
           }
-          if (phoneme.couleur !== undefined) {
-            store.setPhonemeColor(key, phoneme.couleur);
-          }
-        });
+        );
       }
     }
 
     // Sémantique
     if (config.semantique) {
-      if (config.semantique.nom_propre !== undefined) store.setNomPropre(config.semantique.nom_propre);
-      if (config.semantique.date_chiffre !== undefined) store.setDateChiffre(config.semantique.date_chiffre);
-      if (config.semantique.mot_long !== undefined) store.setMotLong(config.semantique.mot_long);
+      if (config.semantique.nom_propre !== undefined)
+        store.setNomPropre(config.semantique.nom_propre);
+      if (config.semantique.date_chiffre !== undefined)
+        store.setDateChiffre(config.semantique.date_chiffre);
+      if (config.semantique.mot_long !== undefined)
+        store.setMotLong(config.semantique.mot_long);
     }
 
     // Modes et outils
     if (config.mode_p_p !== undefined) store.setModePP(config.mode_p_p);
-    if (config.barre_progression !== undefined) store.setBarreProgression(config.barre_progression);
-    if (config.focus_paragraphe !== undefined) store.setFocusParagraphe(config.focus_paragraphe);
-    if (config.regle_lecture !== undefined) store.setRegleLecture(config.regle_lecture);
-    if (config.ligne_focus !== undefined) store.setLigneFocus(config.ligne_focus);
+    if (config.barre_progression !== undefined)
+      store.setBarreProgression(config.barre_progression);
+    if (config.focus_paragraphe !== undefined)
+      store.setFocusParagraphe(config.focus_paragraphe);
+    if (config.regle_lecture !== undefined)
+      store.setRegleLecture(config.regle_lecture);
+    if (config.ligne_focus !== undefined)
+      store.setLigneFocus(config.ligne_focus);
 
     // Accessibilité
     if (config.daltonien !== undefined) store.setDaltonien(config.daltonien);
-    
+
     console.log("✅ Config appliquée avec succès");
   };
 
@@ -205,7 +226,7 @@ export default function VoiceCommand() {
         applyConfigToStore(data.config);
         setFeedback(`✓ ${data.message}`);
         setCommand("");
-        
+
         // Fermer automatiquement après 2 secondes
         setTimeout(() => {
           setIsOpen(false);
@@ -257,148 +278,161 @@ export default function VoiceCommand() {
       </button>
 
       {/* Panneau de commande */}
-      {isOpen && createPortal(
-        <div className="voice-command-panel">
-          <div className="voice-command-header">
-            <h3>Commande Vocale</h3>
-            <button
-              className="voice-command-close"
-              onClick={() => setIsOpen(false)}
-              aria-label="Fermer"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="voice-command-content">
-            {/* Zone de texte */}
-            <div className="voice-command-input-group">
-              <textarea
-                className="voice-command-input"
-                value={command}
-                onChange={(e) => setCommand(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Dites ou écrivez votre commande...
-Ex: Active le mode sombre, Police Arial, etc."
-                rows={3}
-                disabled={isProcessing}
-              />
-
-              <div className="voice-command-buttons">
-                {/* Bouton micro */}
-                <button
-                  className={`voice-command-btn voice-command-mic ${
-                    isListening ? "listening" : ""
-                  } ${!recognition ? "disabled" : ""}`}
-                  onClick={recognition ? toggleListening : undefined}
-                  disabled={isProcessing || !recognition}
-                  title={
-                    !recognition
-                      ? "Reconnaissance vocale non supportée par ce navigateur"
-                      : isListening
-                      ? "Arrêter l'écoute"
-                      : "Démarrer l'écoute vocale"
-                  }
-                >
-                  {isListening ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <rect x="6" y="4" width="4" height="16" rx="1" />
-                      <rect x="14" y="4" width="4" height="16" rx="1" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                      <line x1="12" x2="12" y1="19" y2="22"></line>
-                    </svg>
-                  )}
-                </button>
-
-                {/* Bouton envoyer */}
-                <button
-                  className="voice-command-btn voice-command-submit"
-                  onClick={handleSubmit}
-                  disabled={isProcessing || !command.trim()}
-                  title="Envoyer la commande"
-                >
-                  {isProcessing ? (
-                    <svg
-                      className="spinner"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="m22 2-7 20-4-9-9-4Z"></path>
-                      <path d="M22 2 11 13"></path>
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Feedback */}
-            {feedback && (
-              <div
-                className={`voice-command-feedback ${
-                  feedback.startsWith("✓") ? "success" : ""
-                } ${feedback.startsWith("Erreur") ? "error" : ""}`}
+      {isOpen &&
+        createPortal(
+          <div className="voice-command-panel">
+            <div className="voice-command-header">
+              <h3>Commande Vocale</h3>
+              <button
+                className="voice-command-close"
+                onClick={() => setIsOpen(false)}
+                aria-label="Fermer"
               >
-                {feedback}
-              </div>
-            )}
-
-            {/* Exemples de commandes */}
-            <div className="voice-command-examples">
-              <p className="voice-command-examples-title">Exemples de commandes :</p>
-              <ul>
-                <li onClick={() => setCommand("Active le mode sombre")}>
-                  "Active le mode sombre"
-                </li>
-                <li onClick={() => setCommand("Police OpenDyslexic taille 20")}>
-                  "Police OpenDyslexic taille 20"
-                </li>
-                <li onClick={() => setCommand("Active le surlignage des phonèmes")}>
-                  "Active le surlignage des phonèmes"
-                </li>
-                <li onClick={() => setCommand("Augmente l'espacement entre les mots")}>
-                  "Augmente l'espacement entre les mots"
-                </li>
-              </ul>
+                ✕
+              </button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+
+            <div className="voice-command-content">
+              {/* Zone de texte */}
+              <div className="voice-command-input-group">
+                <textarea
+                  className="voice-command-input"
+                  value={command}
+                  onChange={(e) => setCommand(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Dites ou écrivez votre commande...
+Ex: Active le mode sombre, Police Arial, etc."
+                  rows={3}
+                  disabled={isProcessing}
+                />
+
+                <div className="voice-command-buttons">
+                  {/* Bouton micro */}
+                  <button
+                    className={`voice-command-btn voice-command-mic ${
+                      isListening ? "listening" : ""
+                    } ${!recognition ? "disabled" : ""}`}
+                    onClick={recognition ? toggleListening : undefined}
+                    disabled={isProcessing || !recognition}
+                    title={
+                      !recognition
+                        ? "Reconnaissance vocale non supportée par ce navigateur"
+                        : isListening
+                        ? "Arrêter l'écoute"
+                        : "Démarrer l'écoute vocale"
+                    }
+                  >
+                    {isListening ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" x2="12" y1="19" y2="22"></line>
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Bouton envoyer */}
+                  <button
+                    className="voice-command-btn voice-command-submit"
+                    onClick={handleSubmit}
+                    disabled={isProcessing || !command.trim()}
+                    title="Envoyer la commande"
+                  >
+                    {isProcessing ? (
+                      <svg
+                        className="spinner"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="m22 2-7 20-4-9-9-4Z"></path>
+                        <path d="M22 2 11 13"></path>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Feedback */}
+              {feedback && (
+                <div
+                  className={`voice-command-feedback ${
+                    feedback.startsWith("✓") ? "success" : ""
+                  } ${feedback.startsWith("Erreur") ? "error" : ""}`}
+                >
+                  {feedback}
+                </div>
+              )}
+
+              {/* Exemples de commandes */}
+              <div className="voice-command-examples">
+                <p className="voice-command-examples-title">
+                  Exemples de commandes :
+                </p>
+                <ul>
+                  <li onClick={() => setCommand("Active le mode sombre")}>
+                    "Active le mode sombre"
+                  </li>
+                  <li
+                    onClick={() => setCommand("Police OpenDyslexic taille 20")}
+                  >
+                    "Police OpenDyslexic taille 20"
+                  </li>
+                  <li
+                    onClick={() =>
+                      setCommand("Active le surlignage des phonèmes")
+                    }
+                  >
+                    "Active le surlignage des phonèmes"
+                  </li>
+                  <li
+                    onClick={() =>
+                      setCommand("Augmente l'espacement entre les mots")
+                    }
+                  >
+                    "Augmente l'espacement entre les mots"
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

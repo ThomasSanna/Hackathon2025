@@ -1,106 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 // Fonction utilitaire pour normaliser les dates dans le texte
 const prepareTextForSpeech = (text: string) => {
   const months = [
-    "janvier", "février", "mars", "avril", "mai", "juin",
-    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
   ];
 
   let spokenText = "";
-  const segments: { originalStart: number; originalLength: number; spokenStart: number; spokenLength: number; isModified: boolean }[] = [];
+  const segments: {
+    originalStart: number;
+    originalLength: number;
+    spokenStart: number;
+    spokenLength: number;
+    isModified: boolean;
+  }[] = [];
   let lastIndex = 0;
 
   // Regex pour DD/MM/YYYY ou DD-MM-YYYY ou YYYY-MM-DD ou YYYY-YYYY (avec support espaces et tirets)
-  const regex = /\b((\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4}))|((\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2}))|((\d{4})\s?[-–]\s?(\d{4}))\b/g;
-  
+  const regex =
+    /\b((\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4}))|((\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2}))|((\d{4})\s?[-–]\s?(\d{4}))\b/g;
+
   let match;
   while ((match = regex.exec(text)) !== null) {
     // Ajouter le texte avant le match
     const preText = text.substring(lastIndex, match.index);
     if (preText) {
-        segments.push({
-            originalStart: lastIndex,
-            originalLength: preText.length,
-            spokenStart: spokenText.length,
-            spokenLength: preText.length,
-            isModified: false
-        });
-        spokenText += preText;
+      segments.push({
+        originalStart: lastIndex,
+        originalLength: preText.length,
+        spokenStart: spokenText.length,
+        spokenLength: preText.length,
+        isModified: false,
+      });
+      spokenText += preText;
     }
 
     if (match[9]) {
-        // Cas YYYY-YYYY
-        const startYear = match[10];
-        const endYear = match[11];
-        const replacement = `${startYear} à ${endYear}`;
-        
+      // Cas YYYY-YYYY
+      const startYear = match[10];
+      const endYear = match[11];
+      const replacement = `${startYear} à ${endYear}`;
+
+      segments.push({
+        originalStart: match.index,
+        originalLength: match[0].length,
+        spokenStart: spokenText.length,
+        spokenLength: replacement.length,
+        isModified: true,
+      });
+      spokenText += replacement;
+      lastIndex = match.index + match[0].length;
+    } else {
+      let day, month, year;
+      if (match[2]) {
+        // DD/MM/YYYY
+        day = match[2];
+        month = match[3];
+        year = match[4];
+      } else {
+        // YYYY-MM-DD
+        year = match[6];
+        month = match[7];
+        day = match[8];
+      }
+
+      const m = parseInt(month, 10);
+      if (m >= 1 && m <= 12) {
+        // Convertir la date
+        let d = parseInt(day, 10);
+        const dayStr = d === 1 ? "premier" : d.toString();
+        const replacement = `${dayStr} ${months[m - 1]} ${year}`;
+
         segments.push({
-            originalStart: match.index,
-            originalLength: match[0].length,
-            spokenStart: spokenText.length,
-            spokenLength: replacement.length,
-            isModified: true
+          originalStart: match.index,
+          originalLength: match[0].length,
+          spokenStart: spokenText.length,
+          spokenLength: replacement.length,
+          isModified: true,
         });
         spokenText += replacement;
-        lastIndex = match.index + match[0].length;
-    } else {
-        let day, month, year;
-        if (match[2]) {
-           // DD/MM/YYYY
-           day = match[2]; month = match[3]; year = match[4];
-        } else {
-           // YYYY-MM-DD
-           year = match[6]; month = match[7]; day = match[8];
-        }
-
-        const m = parseInt(month, 10);
-        if (m >= 1 && m <= 12) {
-            // Convertir la date
-            let d = parseInt(day, 10);
-            const dayStr = d === 1 ? "premier" : d.toString();
-            const replacement = `${dayStr} ${months[m - 1]} ${year}`;
-            
-            segments.push({
-                originalStart: match.index,
-                originalLength: match[0].length,
-                spokenStart: spokenText.length,
-                spokenLength: replacement.length,
-                isModified: true
-            });
-            spokenText += replacement;
-        } else {
-            // Date invalide (mois hors limites), on garde le texte original
-            segments.push({
-                originalStart: match.index,
-                originalLength: match[0].length,
-                spokenStart: spokenText.length,
-                spokenLength: match[0].length,
-                isModified: false
-            });
-            spokenText += match[0];
-        }
-        lastIndex = match.index + match[0].length;
+      } else {
+        // Date invalide (mois hors limites), on garde le texte original
+        segments.push({
+          originalStart: match.index,
+          originalLength: match[0].length,
+          spokenStart: spokenText.length,
+          spokenLength: match[0].length,
+          isModified: false,
+        });
+        spokenText += match[0];
+      }
+      lastIndex = match.index + match[0].length;
     }
   }
 
   // Ajouter le reste du texte
   const remaining = text.substring(lastIndex);
   if (remaining) {
-      segments.push({
-          originalStart: lastIndex,
-          originalLength: remaining.length,
-          spokenStart: spokenText.length,
-          spokenLength: remaining.length,
-          isModified: false
-      });
-      spokenText += remaining;
+    segments.push({
+      originalStart: lastIndex,
+      originalLength: remaining.length,
+      spokenStart: spokenText.length,
+      spokenLength: remaining.length,
+      isModified: false,
+    });
+    spokenText += remaining;
   }
 
   // Si aucun segment (texte vide ou sans date), on crée un segment par défaut
   if (segments.length === 0 && text.length > 0) {
-      return { spokenText: text, segments: [{ originalStart: 0, originalLength: text.length, spokenStart: 0, spokenLength: text.length, isModified: false }] };
+    return {
+      spokenText: text,
+      segments: [
+        {
+          originalStart: 0,
+          originalLength: text.length,
+          spokenStart: 0,
+          spokenLength: text.length,
+          isModified: false,
+        },
+      ],
+    };
   }
 
   return { spokenText: spokenText || text, segments };
@@ -111,9 +143,10 @@ export default function Karaoke() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(-1);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [selectedVoice, setSelectedVoice] =
+    useState<SpeechSynthesisVoice | null>(null);
   const [rate, setRate] = useState(1);
-  
+
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const blocksRef = useRef<HTMLElement[]>([]);
   const currentWordSpanRef = useRef<HTMLSpanElement | null>(null);
@@ -124,7 +157,7 @@ export default function Karaoke() {
       const availableVoices = window.speechSynthesis.getVoices();
       setVoices(availableVoices);
       // Préférer une voix française
-      const frVoice = availableVoices.find(v => v.lang.startsWith('fr'));
+      const frVoice = availableVoices.find((v) => v.lang.startsWith("fr"));
       if (frVoice) setSelectedVoice(frVoice);
     };
 
@@ -140,18 +173,23 @@ export default function Karaoke() {
   useEffect(() => {
     if (isActive) {
       // Détecter le conteneur visible
-      let container = document.getElementById('doc-container');
-      const mobileContainer = document.getElementById('mobile-reader');
-      
+      let container = document.getElementById("doc-container");
+      const mobileContainer = document.getElementById("mobile-reader");
+
       // Vérifier si le conteneur mobile est visible (display block ou flex)
-      if (mobileContainer && window.getComputedStyle(mobileContainer).display !== 'none') {
+      if (
+        mobileContainer &&
+        window.getComputedStyle(mobileContainer).display !== "none"
+      ) {
         container = mobileContainer;
       }
-      
+
       if (container) {
         // Sélectionner les éléments de texte significatifs
         // Note: Sur mobile, cela sélectionnera tous les éléments de toutes les pages chargées
-        const elements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, blockquote');
+        const elements = container.querySelectorAll(
+          "p, h1, h2, h3, h4, h5, h6, li, blockquote"
+        );
         blocksRef.current = Array.from(elements) as HTMLElement[];
       }
     } else {
@@ -171,24 +209,33 @@ export default function Karaoke() {
     if (currentWordSpanRef.current) {
       const parent = currentWordSpanRef.current.parentNode;
       if (parent) {
-        parent.replaceChild(document.createTextNode(currentWordSpanRef.current.textContent || ''), currentWordSpanRef.current);
+        parent.replaceChild(
+          document.createTextNode(currentWordSpanRef.current.textContent || ""),
+          currentWordSpanRef.current
+        );
         parent.normalize(); // Fusionner les nœuds texte adjacents
       }
       currentWordSpanRef.current = null;
     }
-    
+
     // Retirer la classe active du bloc
-    blocksRef.current.forEach(block => block.classList.remove('karaoke-active-block'));
+    blocksRef.current.forEach((block) =>
+      block.classList.remove("karaoke-active-block")
+    );
   };
 
-  const highlightWord = (block: HTMLElement, charIndex: number, charLength: number) => {
+  const highlightWord = (
+    block: HTMLElement,
+    charIndex: number,
+    charLength: number
+  ) => {
     const textNodes = getTextNodes(block);
     let currentLength = 0;
     let startNode: Node | null = null;
     let startOffset = 0;
     let endNode: Node | null = null;
     let endOffset = 0;
-    
+
     // Find start
     for (const node of textNodes) {
       const nodeLength = node.textContent?.length || 0;
@@ -216,17 +263,17 @@ export default function Karaoke() {
     }
 
     if (startNode && endNode) {
-        const range = document.createRange();
-        range.setStart(startNode, startOffset);
-        range.setEnd(endNode, endOffset);
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-        
-        // Scroll vers le mot si nécessaire (optionnel, peut être distrayant)
-        // if (startNode.parentElement) {
-        //    startNode.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // }
+      const range = document.createRange();
+      range.setStart(startNode, startOffset);
+      range.setEnd(endNode, endOffset);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+
+      // Scroll vers le mot si nécessaire (optionnel, peut être distrayant)
+      // if (startNode.parentElement) {
+      //    startNode.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // }
     }
   };
 
@@ -250,36 +297,44 @@ export default function Karaoke() {
 
     const block = blocksRef.current[index];
     setCurrentBlockIndex(index);
-    
-    // Surligner le bloc actif
-    blocksRef.current.forEach(b => b.classList.remove('karaoke-active-block'));
-    block.classList.add('karaoke-active-block');
-    block.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    const originalText = block.textContent || '';
+    // Surligner le bloc actif
+    blocksRef.current.forEach((b) =>
+      b.classList.remove("karaoke-active-block")
+    );
+    block.classList.add("karaoke-active-block");
+    block.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const originalText = block.textContent || "";
     // Préparer le texte pour la lecture (normalisation des dates)
     const { spokenText, segments } = prepareTextForSpeech(originalText);
 
     const utterance = new SpeechSynthesisUtterance(spokenText);
-    
+
     if (selectedVoice) utterance.voice = selectedVoice;
     utterance.rate = rate;
-    utterance.lang = 'fr-FR';
+    utterance.lang = "fr-FR";
 
     utterance.onboundary = (event) => {
-      if (event.name === 'word') {
+      if (event.name === "word") {
         const wordStart = event.charIndex;
         // Trouver la longueur du mot dans le texte parlé
-        const nextSpace = spokenText.indexOf(' ', wordStart);
-        const wordLength = nextSpace === -1 ? spokenText.length - wordStart : nextSpace - wordStart;
-        
+        const nextSpace = spokenText.indexOf(" ", wordStart);
+        const wordLength =
+          nextSpace === -1
+            ? spokenText.length - wordStart
+            : nextSpace - wordStart;
+
         // Mapper vers le texte original
         let originalIndex = wordStart;
         let originalLen = wordLength;
 
         // Trouver le segment correspondant
         for (const seg of segments) {
-          if (wordStart >= seg.spokenStart && wordStart < seg.spokenStart + seg.spokenLength) {
+          if (
+            wordStart >= seg.spokenStart &&
+            wordStart < seg.spokenStart + seg.spokenLength
+          ) {
             if (seg.isModified) {
               // Si c'est une date modifiée, on surligne toute la date originale
               originalIndex = seg.originalStart;
@@ -292,7 +347,7 @@ export default function Karaoke() {
             break;
           }
         }
-        
+
         highlightWord(block, originalIndex, originalLen);
       }
     };
@@ -333,50 +388,106 @@ export default function Karaoke() {
   return (
     <>
       <button
-        className={`karaoke-trigger ${isActive ? 'active' : ''}`}
+        className={`karaoke-trigger ${isActive ? "active" : ""}`}
         onClick={() => setIsActive(!isActive)}
         title="Mode Lecture Audio (Karaoké)"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
           <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
         </svg>
       </button>
 
-      {isActive && createPortal(
-        <div className="karaoke-panel">
-          <div className="karaoke-controls">
-            <button onClick={togglePlay} className="karaoke-btn main">
-              {isPlaying ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              )}
-            </button>
-            
-            <button onClick={handleStop} className="karaoke-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16"></rect></svg>
-            </button>
+      {isActive &&
+        createPortal(
+          <div className="karaoke-panel">
+            <div className="karaoke-controls">
+              <button onClick={togglePlay} className="karaoke-btn main">
+                {isPlaying ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                )}
+              </button>
 
-            <div className="karaoke-settings">
-              <select 
-                value={rate} 
-                onChange={(e) => setRate(parseFloat(e.target.value))}
-                className="karaoke-select"
-              >
-                <option value="0.5">0.5x</option>
-                <option value="0.75">0.75x</option>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="2">2x</option>
-              </select>
+              <button onClick={handleStop} className="karaoke-btn">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="4" y="4" width="16" height="16"></rect>
+                </svg>
+              </button>
+
+              <div className="karaoke-settings">
+                <select
+                  value={rate}
+                  onChange={(e) => setRate(parseFloat(e.target.value))}
+                  className="karaoke-select"
+                >
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1">1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2">2x</option>
+                </select>
+              </div>
             </div>
-          </div>
-          <button className="karaoke-close" onClick={() => { handleStop(); setIsActive(false); }}>✕</button>
-        </div>,
-        document.body
-      )}
+            <button
+              className="karaoke-close"
+              onClick={() => {
+                handleStop();
+                setIsActive(false);
+              }}
+            >
+              ✕
+            </button>
+          </div>,
+          document.body
+        )}
 
       <style>{`
         .karaoke-trigger {
