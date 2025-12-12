@@ -1,0 +1,42 @@
+{
+  "source_file": "ressources/s19951031_2329_2383.Zeendoc.pdf",
+  "total_pages": 8,
+  "total_images": 2,
+  "document_annotation": "{\n  \"language\": \"fr\",\n  \"title\": \"Compte Rendu Intégral - Séance du 31 octobre 1995\",\n  \"document_type\": \"procès-verbal\",\n  \"summary\": \"Le document est un compte rendu intégral de la séance du Sénat du 31 octobre 1995. Il détaille les discussions et les décisions prises lors de cette séance, notamment concernant les plans de redressement du Crédit Lyonnais et du Comptoir des Entrepreneurs. La séance a été présidée par M. Jean Faure et a inclus des discussions sur divers amendements et des nominations à des organismes extraparlementaires. Les principaux intervenants incluent M. Hervé Gaymard, secrétaire d'État aux finances, et M. Alain Lambert, rapporteur de la commission des finances.\",\n  \"key_points\": [\n    \"Ouverture de la séance par M. Jean Faure.\",\n    \"Discussion et adoption du procès-verbal de la séance précédente.\",\n    \"Nominations à des organismes extraparlementaires.\",\n    \"Discussion des plans de redressement du Crédit Lyonnais et du Comptoir des Entrepreneurs.\",\n    \"Interventions de M. Hervé Gaymard et M. Alain Lambert sur les amendements et les principes de restructuration.\",\n    \"Adoption de plusieurs articles et amendements.\",\n    \"Nomination de membres d'organismes extraparlementaires.\",\n    \"Communication de l'adoption définitive de propositions d'actes communautaires.\",\n    \"Reprise d'une proposition de loi.\",\n    \"Dépôt de propositions d'actes communautaires et d'un avis.\",\n    \"Ordre du jour.\"\n  ],\n  \"authors\": [\n    \"M. Jean Faure\",\n    \"M. Hervé Gaymard\",\n    \"M. Alain Lambert\",\n    \"M. Paul Loridant\"\n  ],\n  \"date\": \"31 octobre 1995\",\n  \"organizations\": [\n    \"Sénat\",\n    \"Journal Officiel de la République Française\",\n    \"Crédit Lyonnais\",\n    \"Comptoir des Entrepreneurs\",\n    \"Commission des finances\",\n    \"Assemblée nationale\"\n  ]\n}",
+  "markdown_files": [
+    "page_1.md",
+    "page_2.md",
+    "page_3.md",
+    "page_4.md",
+    "page_5.md",
+    "page_6.md",
+    "page_7.md",
+    "page_8.md"
+  ],
+  "images": [
+    {
+      "id": "img-0.jpeg",
+      "filename": "page1_img1.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 363,
+        "top_left_y": 177,
+        "bottom_right_x": 1146,
+        "bottom_right_y": 418
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Logo du Sénat - Débats Parlementaires\",\n  \"short_description\": \"Logo du Sénat français avec la mention 'Débats Parlementaires'\",\n  \"detailed_description\": \"L'image montre le logo officiel du Sénat français. Le mot 'SÉNAT' est écrit en grandes lettres majuscules, avec un style de police qui rappelle les inscriptions classiques. En dessous, en plus petites lettres, il y a la mention 'DÉBATS PARLEMENTAIRES', indiquant que le logo est utilisé dans le contexte des discussions et des procédures parlementaires.\",\n  \"data_extracted\": \"\"\n}"
+    },
+    {
+      "id": "img-1.jpeg",
+      "filename": "page1_img2.jpg",
+      "page": 1,
+      "position": {
+        "top_left_x": 685,
+        "top_left_y": 535,
+        "bottom_right_x": 831,
+        "bottom_right_y": 733
+      },
+      "annotation": "{\n  \"image_type\": \"logo\",\n  \"title\": \"Logo du Journal Officiel\",\n  \"short_description\": \"Logo du Journal Officiel de la République Française\",\n  \"detailed_description\": \"Le logo se compose d'un grand 'D' stylisé en noir avec un cercle blanc à l'intérieur. Sous le 'D', le texte 'JOURNAL OFFICIEL' est écrit en majuscules noires sur un fond blanc.\",\n  \"data_extracted\": \"\"\n}"
+    }
+  ]
+}

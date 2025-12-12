@@ -1,0 +1,142 @@
+/* ViewSwitcher.css */
+.view-switcher-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.view-mode-controls {
+    position: absolute;
+    top: 7rem;
+    right: 3rem;
+    z-index: 1000;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    pointer-events: auto;
+}
+
+.sort-controls {
+    position: absolute;
+    top: 7rem;
+    left: 3rem;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    pointer-events: auto;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+.sort-controls label {
+    font-weight: 400;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.sort-select {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.5rem;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.sort-select option {
+    background: #1a1a1a;
+    color: white;
+}
+
+.sort-select:hover {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.sort-select:focus {
+    border-bottom-color: #FF6B35;
+    color: white;
+}
+
+.view-mode-btn {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.view-mode-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: scale(1.05);
+}
+
+.view-mode-btn.active {
+    background: #FF6B35;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+.view-mode-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* File Explorer View Adjustments */
+.document-explorer-view {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 180px;
+}
+
+.document-explorer-view .document-explorer {
+    background: transparent;
+    padding: 0 2rem 2rem 2rem;
+}
+
+/* Ensure smooth transitions between views */
+.view-switcher-wrapper > * {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .view-mode-controls {
+        top: 1rem;
+        right: 1rem;
+        padding: 0.4rem;
+    }
+
+    .view-mode-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .view-mode-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}

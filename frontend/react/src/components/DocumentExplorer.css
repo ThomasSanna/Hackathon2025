@@ -1,0 +1,774 @@
+/* DocumentExplorer.css */
+.document-explorer {
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    background: #fafafa;
+    padding: 2rem;
+    padding-top: 0; /* No extra top padding - ViewSwitcher handles it */
+}
+
+/* Content Area */
+.de-content {
+    display: flex;
+    gap: 2rem;
+}
+
+.de-list {
+    flex: 1;
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Grid View */
+.de-grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.de-grid-view .de-item {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+}
+
+.de-grid-view .de-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.de-grid-view .de-item-selected {
+    border-color: #FF6B35;
+}
+
+.de-item-preview {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f9f9f9;
+    padding: 1rem;
+    font-size: 0.65rem;
+    line-height: 1.2;
+}
+
+.de-item-preview h1,
+.de-item-preview h2,
+.de-item-preview h3 {
+    font-size: 0.75rem;
+    margin: 0.25rem 0;
+}
+
+.de-item-preview p {
+    font-size: 0.65rem;
+    margin: 0.25rem 0;
+}
+
+.de-item-info {
+    padding: 1rem;
+}
+
+.de-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.de-favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.de-favorite-btn:hover {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.de-favorite-btn svg {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.de-favorite-indicator {
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    animation: favoritePulse 0.3s ease-in-out;
+}
+
+@keyframes favoritePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.de-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+}
+
+.de-item-subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+}
+
+.de-item-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #FFF5F0;
+    color: #FF6B35;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* List View */
+.de-list-view {
+    grid-template-columns: 1fr;
+}
+
+.de-list-view .de-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+}
+
+.de-list-view .de-item:hover {
+    background: #fafafa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.de-list-view .de-item-selected {
+    border-color: #FF6B35;
+    background: #FFF5F0;
+}
+
+.de-item-icon {
+    flex-shrink: 0;
+    color: #FF6B35;
+}
+
+.de-item-details {
+    flex: 1;
+}
+
+.de-list-view .de-item-title {
+    margin: 0 0 0.25rem 0;
+}
+
+.de-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+}
+
+.de-item-separator {
+    color: #ddd;
+}
+
+/* Preview Panel */
+.de-preview {
+    width: 400px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.de-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.de-preview-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+}
+
+.de-preview-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #999;
+    transition: color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.de-preview-close:hover {
+    color: #333;
+}
+
+.de-preview-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.de-preview-tag {
+    padding: 0.25rem 0.75rem;
+    background: #FFF5F0;
+    color: #FF6B35;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.de-preview-date {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.de-preview-content {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.de-preview-content h1,
+.de-preview-content h2,
+.de-preview-content h3 {
+    font-size: 1rem;
+    margin: 1rem 0 0.5rem 0;
+    color: #333;
+}
+
+.de-preview-content p {
+    margin: 0.5rem 0;
+}
+
+.de-preview-summary {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 3px solid #FF6B35;
+}
+
+.de-preview-summary h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.de-preview-summary p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+/* Empty State */
+.de-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: #999;
+}
+
+.de-empty svg {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.de-empty p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .de-content {
+        flex-direction: column;
+    }
+
+    .de-preview {
+        width: 100%;
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .document-explorer {
+        padding: 1rem;
+    }
+
+    .de-toolbar {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .de-toolbar-left,
+    .de-toolbar-right {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .de-search input {
+        width: 100%;
+    }
+
+    .de-grid-view {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Configuration Toggle Button */
+.config-toggle-btn {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.config-toggle-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.config-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Configuration Panel */
+.config-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.config-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.config-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.config-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.config-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.config-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.config-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.config-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.config-content::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+
+/* Configuration Sections */
+.config-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.config-section:last-of-type {
+    border-bottom: none;
+}
+
+.config-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.config-section-header svg {
+    color: #667eea;
+}
+
+.config-section-header h4 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.config-description {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+/* Select Inputs */
+.config-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.config-select:hover {
+    border-color: #667eea;
+}
+
+.config-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Slider Controls */
+.config-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.config-slider-group label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.slider-value {
+    display: inline-block;
+    min-width: 40px;
+    text-align: right;
+    color: #667eea;
+    font-weight: 600;
+    float: right;
+}
+
+.config-slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #e0e0e0 0%, #667eea 0%);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.config-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+    transition: all 0.2s ease;
+}
+
+.config-slider::-webkit-slider-thumb:hover {
+    background: #764ba2;
+    transform: scale(1.2);
+}
+
+.config-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+    transition: all 0.2s ease;
+}
+
+.config-slider::-moz-range-thumb:hover {
+    background: #764ba2;
+    transform: scale(1.2);
+}
+
+/* Color Inputs */
+.config-color-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.config-color-group label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.config-color {
+    width: 100%;
+    height: 50px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.config-color:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.config-color:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Toggle Switches */
+.config-toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.config-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+}
+
+.config-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 48px;
+    height: 26px;
+    background: #e0e0e0;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.config-toggle input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.config-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.config-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(22px);
+}
+
+.config-toggle:hover input[type="checkbox"] {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Validate Button */
+.config-validate-btn,
+.validate-config-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.config-validate-btn:hover,
+.validate-config-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.config-validate-btn:active,
+.validate-config-btn:active {
+    transform: translateY(0);
+}
+
+.validate-config-btn {
+    margin-top: 2rem;
+}
+
+/* Daltonism Filters */
+body.daltonism-protanopia img {
+    filter: url('#protanopia');
+}
+
+body.daltonism-deuteranopia img {
+    filter: url('#deuteranopia');
+}
+
+body.daltonism-tritanopia img {
+    filter: url('#tritanopia');
+}
+
+body.daltonism-monochromatism img {
+    filter: grayscale(100%);
+}
+
+/* Responsive for Config Panel */
+@media (max-width: 768px) {
+    .config-panel {
+        width: 100%;
+    }
+    
+    .config-toggle-btn {
+        top: 1rem;
+        right: 1rem;
+        width: 48px;
+        height: 48px;
+    }
+    
+    .config-color-group {
+        grid-template-columns: 1fr;
+    }
+}
+

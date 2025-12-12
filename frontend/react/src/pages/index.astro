@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import ViewSwitcher from '../components/ViewSwitcher.jsx';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { marked } from 'marked';
+
+interface DocumentMetadata {
+  document_annotation?: string;
+  images?: Array<{
+    filename: string;
+    page: number;
+  }>;
+}
+
+interface CarouselDocument {
+  id: string;
+  title: string;
+  subtitle: string;
+  preview: string;
+  tag: string;
+  summary: string;
+}
+
+async function getDocuments(): Promise<CarouselDocument[]> {
+  const outputDir = './src/pages/_output_2';
+  const documents: CarouselDocument[] = [];
+
+  try {
+    const entries = await readdir(outputDir);
+    
+    for (const entry of entries) {
+      const entryPath = join(outputDir, entry);
+      
+      try {
+        const files = await readdir(entryPath);
+        const metadataFile = files.find(f => f.endsWith('_metadata.json'));
+        const page1File = files.find(f => f === 'page_1.md');
+        
+        if (metadataFile && page1File) {
+          const metadataContent = await readFile(join(entryPath, metadataFile), 'utf-8');
+          const metadata: DocumentMetadata = JSON.parse(metadataContent);
+          
+          // Read page 1 markdown content
+          let page1Content = await readFile(join(entryPath, page1File), 'utf-8');
+          
+          // Fix image paths in markdown to point to correct location (before parsing)
+          page1Content = page1Content.replace(/!\[([^\]]*)\]\(images\//g, `![$1](/output_2/${entry}/images/`);
+          
+          // Parse to HTML
+          let page1Html = await marked.parse(page1Content);
+          
+          // Also fix any HTML img tags that might have been generated or exist in content
+          page1Html = page1Html.replace(/src="images\//g, `src="/output_2/${entry}/images/`);
+          page1Html = page1Html.replace(/src='images\//g, `src='/output_2/${entry}/images/`);
+          
+          // Remove all '#' characters from the HTML content
+          page1Html = page1Html.replace(/#/g, '');
+          
+          let annotation: any = {};
+          if (metadata.document_annotation) {
+            try {
+              annotation = JSON.parse(metadata.document_annotation);
+            } catch (e) {
+              console.warn(`Failed to parse annotation for ${entry}`);
+            }
+          }
+          
+          documents.push({
+            id: entry,
+            title: annotation.title || entry.replace('.Zeendoc', ''),
+            subtitle: annotation.date || 'Document',
+            preview: page1Html,
+            tag: annotation.document_type || 'Document',
+            summary: annotation.summary || 'No summary available'
+          });
+        }
+      } catch (err) {
+        console.warn(`Failed to process ${entry}:`, err);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to read output_2 directory:', err);
+  }
+
+  return documents;
+}
+
+const documents = await getDocuments();
+---
+
+<Layout title="Voyage | Your Dreams Come True">
+	<Header />
+	<main>
+		<ViewSwitcher client:only="react" documents={documents} />
+	</main>
+</Layout>
+
+<script>
+	// Listen for search events from header and update ViewSwitcher
+	if (typeof window !== 'undefined') {
+		window.addEventListener('header-search', (e) => {
+			const searchEvent = new CustomEvent('document-search', { 
+				detail: { query: e.detail.query }
+			});
+			window.dispatchEvent(searchEvent);
+		});
+	}
+</script>

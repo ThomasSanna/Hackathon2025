@@ -1,0 +1,18 @@
+---
+source_file: CAT_C_SR.229-FR.Zeendoc.pdf
+page_number: 8
+total_pages: 8
+total_images: 0
+document_title: Compte rendu analytique de la première partie (publique) de la 229ème
+  séance du Comité contre la torture
+language: fr
+document_type: Procès-verbal
+---
+
+22. S'agissant des recommandations faites dans le rapport du Comité européen pour la prévention de la torture et des peines ou traitements inhumains ou dégradants, le représentant du Danemark indique que la plupart de celles-ci ont été suivies d'effet et que d'autres le seront encore, dès que faire se pourra, notamment celle qui concerne l'agrandissement des cours réservées aux détenus dans certaines prisons de Copenhague.
+23. Quant aux mesures disciplinaires frappant les agents de police qui commettent des actes de violence dans l'exercice de leurs fonctions, tout agent reconnu coupable de tels actes est frappé d'une mesure de licenciement assortie d'une peine d'emprisonnement ou d'une mise à pied en cas de blâme; trois agents de police ont été poursuivis en 1992 pour des actes de violence, huit en 1993, huit encore en 1994 et deux en 1995, à ce jour. Le représentant du Danemark ne dispose d'aucun autre chiffre sur ce point.
+24. Un membre du Comité a révoqué en doute l'équité de la règle suivant laquelle toute personne condamnée au pénal était également condamnée aux frais de représentation par un avocat commis d'office. Il y a lieu de noter que cette règle n'est pas appliquée dans le cas de personnes économiquement faibles et que l'acquittement entraîne l'exemption de tout frais de représentation même lorsque l'intéressé choisit lui-même son avocat.
+25. M. SLIM souhaite qu'on lui précise si, au Danemark, la Convention a une autorité supérieure à la législation nationale et si, en cas de contradiction des lois avec la Convention, les magistrats font prévaloir la Convention sur les dispositions internes ou l'inverse.
+26. Mme ILIOPOULOS-STRANGAS demande les raisons du retard avec lequel la Convention européenne des droits de l'homme a été incorporée dans la législation danoise. Elle ne comprend d'ailleurs pas pourquoi le Danemark a choisi de le faire non pas pour que l'instrument puisse être invoqué devant les tribunaux, mais parce que les autorités tenaient à ce que les juges, le ministère public, la police et les avocats ainsi que la société tout entière en acquièrent une connaissance plus intime (CAT/C/17/Add.13, par. 6).
+27. M. REIMANN (Danemark) précise que la Convention ne prime pas la législation danoise. Cela dit, les autorités sont tenues de faire en sorte que la législation nationale soit conforme aux dispositions de la Convention afin de donner effet aux obligations internationales contractées par l'Etat. S'il y a manque de conformité, les tribunaux auraient à interpréter la législation nationale dans le sens des obligations internationales de l'Etat.
+28. Il est vrai que l'incorporation de la Convention européenne des droits de l'homme a accusé un certain retard : de fait, les autorités se sont longuement interrogées sur l'opportunité de son incorporation, puisque cela obligeait les agents communautaires, les agents de police et les magistrats à connaître très exactement les dispositions de la Convention et à être au fait de la jurisprudence en la matière, tâche qui leur paraissait trop lourde pour des agents subalternes. En définitive, le fait que les dispositions de l'instrument s'adressaient directement aux citoyens les a décidés à incorporer la Convention dans le droit interne.

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Config Panel - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            padding: 2rem;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .preview-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature:last-child {
+            border-bottom: none;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .code-preview {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+
+        .button-demo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .button-demo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .toggle-demo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #555;
+            cursor: pointer;
+            margin-right: 2rem;
+        }
+
+        .toggle-switch {
+            appearance: none;
+            width: 48px;
+            height: 26px;
+            background: #e0e0e0;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch:checked::before {
+            transform: translateX(22px);
+        }
+
+        .slider-demo {
+            margin: 1rem 0;
+        }
+
+        .slider-demo label {
+            display: block;
+            font-size: 0.875rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-demo input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .color-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .color-demo label {
+            font-size: 0.875rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .color-demo input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .gradient-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .daltonism-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .daltonism-card {
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .daltonism-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎨 Accessibility Configuration Panel - Visual Preview</h1>
+
+        <div class="preview-box">
+            <div class="feature">
+                <div class="feature-title">⚙️ Configuration Toggle Button</div>
+                <div class="feature-description">
+                    A floating button in the top-right corner that opens the configuration panel. 
+                    Features a beautiful gradient background and rotation animation on hover.
+                </div>
+                <button class="gradient-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m5.2-15.8L13 7.4m-2 2L6.8 5.2M23 12h-6m-6 0H1m15.8 5.2L13 13m-2-2-4.2 4.2"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">🎨 Daltonism Support (Color Blindness)</div>
+                <div class="feature-description">
+                    Five different color correction modes for various types of color blindness. 
+                    Applied in real-time using SVG color matrix filters.
+                </div>
+                <div class="daltonism-demo">
+                    <div class="daltonism-card">
+                        <div class="color-swatch" style="background: linear-gradient(to right, red, green, blue);"></div>
+                        <strong>Aucun</strong>
+                        <p style="font-size: 0.75rem; color: #666;">Normal vision</p>
+                    </div>
+                    <div class="daltonism-card">
+                        <div class="color-swatch" style="background: linear-gradient(to right, #8B7355, #8B7355, blue);"></div>
+                        <strong>Protanopie</strong>
+                        <p style="font-size: 0.75rem; color: #666;">Red blindness</p>
+                    </div>
+                    <div class="daltonism-card">
+                        <div class="color-swatch" style="background: linear-gradient(to right, #B8860B, #B8860B, blue);"></div>
+                        <strong>Deutéranopie</strong>
+                        <p style="font-size: 0.75rem; color: #666;">Green blindness</p>
+                    </div>
+                    <div class="daltonism-card">
+                        <div class="color-swatch" style="background: linear-gradient(to right, red, #FF69B4, #FF69B4);"></div>
+                        <strong>Tritanopie</strong>
+                        <p style="font-size: 0.75rem; color: #666;">Blue blindness</p>
+                    </div>
+                    <div class="daltonism-card">
+                        <div class="color-swatch" style="background: linear-gradient(to right, #888, #888, #888);"></div>
+                        <strong>Monochromatisme</strong>
+                        <p style="font-size: 0.75rem; color: #666;">Grayscale</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">🎚️ Interactive Sliders</div>
+                <div class="feature-description">
+                    Smooth sliders for adjusting spacing and line height. Shows live values as you drag.
+                </div>
+                <div class="slider-demo">
+                    <label>Espace entre mots: <span style="color: #667eea; font-weight: 600;">5px</span></label>
+                    <input type="range" min="0" max="20" value="5">
+                </div>
+                <div class="slider-demo">
+                    <label>Espace entre lettres: <span style="color: #667eea; font-weight: 600;">2px</span></label>
+                    <input type="range" min="0" max="10" value="2">
+                </div>
+                <div class="slider-demo">
+                    <label>Interligne: <span style="color: #667eea; font-weight: 600;">1.5</span></label>
+                    <input type="range" min="1" max="3" step="0.1" value="1.5">
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">🎨 Color Pickers</div>
+                <div class="feature-description">
+                    Three color pickers for theme customization. Each has hover effects and smooth transitions.
+                </div>
+                <div class="color-grid">
+                    <div class="color-demo">
+                        <label>Fond</label>
+                        <input type="color" value="#FFFFFF">
+                    </div>
+                    <div class="color-demo">
+                        <label>Texte</label>
+                        <input type="color" value="#000000">
+                    </div>
+                    <div class="color-demo">
+                        <label>Surlignage</label>
+                        <input type="color" value="#FFFF00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">🔘 Toggle Switches</div>
+                <div class="feature-description">
+                    Beautiful iOS-style toggle switches for enabling/disabling features.
+                </div>
+                <label class="toggle-demo">
+                    <input type="checkbox" class="toggle-switch" checked>
+                    <span>Alternance typographique</span>
+                </label>
+                <label class="toggle-demo">
+                    <input type="checkbox" class="toggle-switch">
+                    <span>Soulignement des syllabes</span>
+                </label>
+                <label class="toggle-demo">
+                    <input type="checkbox" class="toggle-switch" checked>
+                    <span>Règle de lecture</span>
+                </label>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">✅ Validation Button</div>
+                <div class="feature-description">
+                    Primary action button that sends configuration to the backend API. 
+                    Features gradient background and elevation animation.
+                </div>
+                <button class="button-demo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Valider et envoyer au serveur
+                </button>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">🔍 Console Logging</div>
+                <div class="feature-description">
+                    Comprehensive console logs for debugging at every step of the process.
+                </div>
+                <div class="code-preview">
+[DocumentExplorer] Toggling config panel: true
+[DocumentExplorer] Config change: daltonien = Protanopie
+[DocumentExplorer] Applying daltonism filter: Protanopie
+[DocumentExplorer] Applied class: daltonism-protanopia
+[DocumentExplorer] Validating configuration...
+[DocumentExplorer] Sending to: http://localhost:8000/api/config
+[DocumentExplorer] Response status: 200
+[DocumentExplorer] ✓ Configuration validated successfully
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-title">📋 JSON Configuration</div>
+                <div class="feature-description">
+                    Complete configuration structure sent to the backend in JSON format.
+                </div>
+                <div class="code-preview">
+{
+  "espace_mot": 5,
+  "espace_lettre": 2,
+  "font": "Arial",
+  "interligne": 1.5,
+  "theme": {
+    "couleur_fond": "#FFFFFF",
+    "couleur_texte": "#000000",
+    "couleur_surlignage": "#FFFF00"
+  },
+  "daltonien": "Protanopie",
+  "regle_lecture": true,
+  "ligne_focus": false,
+  ...
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <strong>✨ Key Features:</strong>
+            <ul style="margin-top: 0.5rem; margin-left: 1.5rem; color: #555;">
+                <li>Ultra-modern gradient design (purple/blue)</li>
+                <li>Smooth animations on all interactions</li>
+                <li>Real-time visual feedback</li>
+                <li>Complete daltonism support with SVG filters</li>
+                <li>FastAPI backend integration</li>
+                <li>Comprehensive console logging</li>
+                <li>Fully responsive design</li>
+                <li>Accessibility-focused UI</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

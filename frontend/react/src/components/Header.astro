@@ -1,0 +1,587 @@
+---
+---
+
+<header class="header">
+    <div class="header-content container">
+        <a href="/" class="logo">Zeendoc</a>
+        
+        <nav class="nav-links">
+            <a href="/" class="active">Library</a>
+            <a href="#search">Search</a>
+            <a href="#about">About</a>
+            <a href="#archive">Archive</a>
+        </nav>
+
+        <div class="mic-btn-wrapper">
+            <button id="mic-btn" class="mic-btn" aria-label="Voice Control">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="header-actions">
+            <div class="search-container">
+                <button class="search-btn" id="search-toggle-btn" aria-label="Search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <input 
+                    type="text" 
+                    id="header-search-input"
+                    class="search-input" 
+                    placeholder="Search documents..."
+                    aria-label="Search documents"
+                />
+            </div>
+            <button class="btn btn-secondary" id="login-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span id="login-text">Sign In</span>
+            </button>
+            <a href="#upload" class="btn btn-primary">Upload Document</a>
+        </div>
+    </div>
+</header>
+
+<style>
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        padding: 2rem 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1.5rem;
+        position: relative; /* Make relative for absolute children context if needed, though header is fixed */
+    }
+
+    .logo {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: white;
+        letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+        display: none; /* Hidden to make room for microphone */
+    }
+
+    /* Microphone Button Styles */
+    .mic-btn-wrapper {
+        position: absolute;
+        left: 50%;
+        top: 30%; /* moved higher in the y-axis */
+        transform: translate(-50%, -50%);
+        z-index: 200;
+    }
+
+    .mic-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        color: white;
+    }
+
+    .mic-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .mic-btn:active {
+        transform: scale(0.95);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .search-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: white;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .search-input {
+        width: 0;
+        opacity: 0;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .search-input.active {
+        width: 200px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Login Modal Styles */
+    .login-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .login-modal.active {
+        display: flex;
+    }
+
+    .login-modal-content {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-modal-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-modal-header h2 {
+        color: white;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-modal-header p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #FF6B35;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .login-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .login-actions button {
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: 10px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-login {
+        background: #FF6B35;
+        border: none;
+        color: white;
+    }
+
+    .btn-login:hover {
+        background: #ff5722;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .error-message {
+        color: #ff4444;
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 0.5rem;
+        background: rgba(255, 68, 68, 0.1);
+        border-radius: 8px;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    /* Login Button States */
+    .btn.btn-secondary {
+        background: rgba(255, 107, 53, 0.1);
+        color: #FF6B35;
+        border: 1px solid rgba(255, 107, 53, 0.2);
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .btn.btn-secondary:hover {
+        background: rgba(255, 107, 53, 0.2);
+        border-color: rgba(255, 107, 53, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn.btn-secondary.logged-in {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .btn.btn-secondary.logged-in:hover {
+        background: rgba(76, 175, 80, 0.2);
+        border-color: rgba(76, 175, 80, 0.4);
+    }
+</style>
+
+<div class="login-modal" id="login-modal">
+    <div class="login-modal-content">
+        <div class="login-modal-header">
+            <h2>Welcome to Zeendoc</h2>
+            <p>Enter your username to continue</p>
+        </div>
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username-input"
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                />
+            </div>
+            <div class="error-message" id="error-message"></div>
+            <div class="login-actions">
+                <button type="button" class="btn-cancel" id="cancel-btn">Cancel</button>
+                <button type="submit" class="btn-login">Sign In</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const micBtn = document.getElementById('mic-btn');
+    const searchToggleBtn = document.getElementById('search-toggle-btn');
+    const searchInput = document.getElementById('header-search-input');
+    const loginBtn = document.getElementById('login-btn');
+    const loginModal = document.getElementById('login-modal');
+    const loginForm = document.getElementById('login-form');
+    const usernameInput = document.getElementById('username-input');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const errorMessage = document.getElementById('error-message');
+    const loginText = document.getElementById('login-text');
+
+    // API Configuration
+    const API_BASE_URL = 'http://localhost:8000';
+
+    // Check if user is already logged in
+    function checkAuthStatus() {
+        const token = localStorage.getItem('zeendoc_token');
+        const username = localStorage.getItem('zeendoc_username');
+        
+        if (token && username) {
+            updateUIForLoggedInUser(username);
+        }
+    }
+
+    // Update UI when user is logged in
+    function updateUIForLoggedInUser(username: string) {
+        if (loginText && loginBtn) {
+            loginText.textContent = username;
+            loginBtn.classList.add('logged-in');
+        }
+    }
+
+    // Update UI when user logs out
+    function updateUIForLoggedOutUser() {
+        if (loginText && loginBtn) {
+            loginText.textContent = 'Sign In';
+            loginBtn.classList.remove('logged-in');
+        }
+    }
+
+    // Show error message
+    function showError(message: string) {
+        if (errorMessage) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+    }
+
+    // Login function
+    async function login(username: string) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Login failed');
+            }
+
+            const data = await response.json();
+            
+            // Store token and username
+            localStorage.setItem('zeendoc_token', data.token);
+            localStorage.setItem('zeendoc_username', data.user.username);
+            
+            // Update UI
+            updateUIForLoggedInUser(data.user.username);
+            
+            // Close modal
+            if (loginModal) {
+                loginModal.classList.remove('active');
+            }
+            
+            // Reset form
+            if (loginForm) {
+                loginForm.reset();
+            }
+
+            // Dispatch custom event for other components
+            window.dispatchEvent(new CustomEvent('user-logged-in', { 
+                detail: { 
+                    username: data.user.username,
+                    token: data.token 
+                }
+            }));
+
+            console.log('Login successful:', data.user.username);
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showError(error instanceof Error ? error.message : 'Failed to login. Please try again.');
+        }
+    }
+
+    // Logout function
+    function logout() {
+        localStorage.removeItem('zeendoc_token');
+        localStorage.removeItem('zeendoc_username');
+        updateUIForLoggedOutUser();
+        
+        // Dispatch custom event
+        window.dispatchEvent(new CustomEvent('user-logged-out'));
+        
+        console.log('Logged out successfully');
+    }
+
+    // Microphone button
+    if (micBtn) {
+        micBtn.addEventListener('click', () => {
+            console.log('Microphone clicked');
+        });
+    }
+
+    // Search functionality
+    if (searchToggleBtn && searchInput) {
+        searchToggleBtn.addEventListener('click', () => {
+            searchInput.classList.toggle('active');
+            if (searchInput.classList.contains('active')) {
+                searchInput.focus();
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            window.dispatchEvent(new CustomEvent('header-search', { 
+                detail: { query: (e.target as HTMLInputElement).value }
+            }));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target instanceof Node && !searchToggleBtn.contains(e.target) && !searchInput.contains(e.target)) {
+                searchInput.classList.remove('active');
+            }
+        });
+    }
+
+    // Login button - toggle between login and profile
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            const token = localStorage.getItem('zeendoc_token');
+            
+            if (token) {
+                // User is logged in - show logout option or profile
+                const confirmLogout = confirm('Do you want to logout?');
+                if (confirmLogout) {
+                    logout();
+                }
+            } else {
+                // User is not logged in - show login modal
+                if (loginModal) {
+                    loginModal.classList.add('active');
+                    if (usernameInput) {
+                        usernameInput.focus();
+                    }
+                }
+            }
+        });
+    }
+
+    // Login form submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (usernameInput) {
+                const username = usernameInput.value.trim();
+                
+                if (!username) {
+                    showError('Please enter a username');
+                    return;
+                }
+                
+                await login(username);
+            }
+        });
+    }
+
+    // Cancel button
+    if (cancelBtn && loginModal) {
+        cancelBtn.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+            if (loginForm) {
+                loginForm.reset();
+            }
+            if (errorMessage) {
+                errorMessage.classList.remove('show');
+            }
+        });
+    }
+
+    // Close modal on outside click
+    if (loginModal) {
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+                if (loginForm) {
+                    loginForm.reset();
+                }
+                if (errorMessage) {
+                    errorMessage.classList.remove('show');
+                }
+            }
+        });
+    }
+
+    // Check auth status on page load
+    checkAuthStatus();
+</script>

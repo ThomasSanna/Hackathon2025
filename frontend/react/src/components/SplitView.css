@@ -1,0 +1,615 @@
+/* src/components/SplitView.css */
+.split-view-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75vw;
+    max-width: 1000px;
+    height: 85vh;
+    background: #f5f5f5;
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    /* Content left, Sidebar right */
+    animation: fadeIn 0.5s ease-in-out;
+    overflow: hidden;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.split-sidebar {
+    flex: 0 0 380px;
+    min-width: 380px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(102, 126, 234, 0.15);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(102, 126, 234, 0.1);
+    z-index: 10;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 2rem 2rem 1.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+    position: relative;
+}
+
+.sidebar-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.sidebar-header h2 {
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem 0;
+    color: white;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.sidebar-header p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    font-weight: 400;
+}
+
+.config-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.config-scroll-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.config-scroll-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.config-scroll-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+.config-scroll-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Configuration Sections */
+.config-section {
+    margin-bottom: 1.25rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(102, 126, 234, 0.08);
+    transition: all 0.3s ease;
+}
+
+.config-section:hover {
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.12);
+    transform: translateY(-2px);
+}
+
+.config-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.config-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+.config-section-header svg {
+    color: #667eea;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
+}
+
+.config-section-header h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Select Inputs */
+.config-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(102, 126, 234, 0.15);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    background: linear-gradient(to bottom, #ffffff, #fafafa);
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.config-select:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    transform: translateY(-1px);
+}
+
+.config-select:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+/* Slider Controls */
+.config-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.config-slider-group label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.slider-value {
+    display: inline-block;
+    min-width: 40px;
+    text-align: right;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    float: right;
+    font-size: 0.85rem;
+}
+
+.config-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.config-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(102, 126, 234, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 3px solid white;
+}
+
+.config-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.config-slider::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+}
+
+.config-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 3px 8px rgba(102, 126, 234, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.config-slider::-moz-range-thumb:hover {
+    transform: scale(1.25);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.config-slider::-moz-range-thumb:active {
+    transform: scale(1.1);
+}
+
+/* Color Inputs */
+.config-color-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.config-color-group label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.config-color {
+    width: 100%;
+    height: 50px;
+    border: 3px solid rgba(102, 126, 234, 0.15);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.config-color:hover {
+    border-color: #667eea;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+.config-color:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+/* Toggle Switches */
+.config-toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.config-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.825rem;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+}
+
+.config-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 48px;
+    height: 26px;
+    background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.config-toggle input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(102, 126, 234, 0.4);
+}
+
+.config-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #ffffff, #f5f5f5);
+    top: 2px;
+    left: 2px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.config-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(22px);
+    background: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.config-toggle:hover input[type="checkbox"] {
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.config-toggle:hover input[type="checkbox"]:checked {
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 12px rgba(102, 126, 234, 0.5);
+}
+
+/* Validate Button */
+.config-validate-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 1.5rem;
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.config-validate-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.config-validate-btn:hover::before {
+    left: 100%;
+}
+
+.config-validate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.config-validate-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove old handicap section styles */
+.handicap-section {
+    display: none;
+}
+
+.handicap-options {
+    display: none;
+}
+
+.checkbox-label {
+    display: none;
+}
+
+.split-content {
+    flex: 1;
+    /* Take remaining space */
+    padding: 0;
+    background: #fafafa;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.single-version-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.single-version-preview .version-card {
+    width: 100%;
+    height: 100%;
+}
+
+.single-version-preview .version-card:hover {
+    transform: none;
+    cursor: default;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1.5rem;
+    left: 2rem;
+    /* Move to left side of container or keep on right? Since sidebar is right, maybe close button on Sidebar? */
+    /* Let's put it top-right of the Content area for now, or Move it to the Sidebar later.
+       Actually, standard UX usually has close top-right of the whole modal.
+       If Sidebar is Right, Close Top-Right of Sidebar seems best. */
+    display: none;
+    /* Hiding this one, will move to sidebar in JSX if possible or absolute position relative to Overlay */
+}
+
+/* Re-implementing close button to be global top-right of the overlay */
+.global-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    color: #667eea;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 600;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.global-close-btn:hover {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+    color: white;
+    border-color: transparent;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.versions-grid {
+    display: none;
+    /* Hidden since we're using single preview now */
+}
+
+.version-card {
+    background: white;
+    border-radius: 20px;
+    /* Match carousel radius */
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 2/3;
+    /* Enforce vertical aspect ratio roughly matching 280x420 */
+}
+
+.version-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.version-card.selected {
+    border: none;
+}
+
+.version-preview {
+    width: 100%;
+    height: 100%;
+    /* Take full height of card */
+    overflow: hidden;
+    background: #f0f0f0;
+    position: relative;
+}
+
+/* Remove filter effects logic if we just want same image? 
+   User said "exact same image as the carrousel but wiht differents themes".
+   "Different themes" usually implies the filters should stay. 
+   "Just the image" means no text. 
+   I will keep the filter rules below, they target .version-preview which exists. */
+
+/* .slide-preview styles usually come from Carousel.css, but we can ensure it fills height here */
+.version-preview .slide-preview {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Or auto if we want scrolling */
+}
+
+/* Daltonism Filters */
+body.daltonism-protanopia img {
+    filter: url('#protanopia');
+}
+
+body.daltonism-deuteranopia img {
+    filter: url('#deuteranopia');
+}
+
+body.daltonism-tritanopia img {
+    filter: url('#tritanopia');
+}
+
+body.daltonism-monochromatism img {
+    filter: grayscale(100%);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .split-view-overlay {
+        flex-direction: column;
+        width: 90vw;
+        height: 90vh;
+    }
+
+    .split-sidebar {
+        flex: 0 0 auto;
+        min-width: unset;
+        width: 100%;
+        max-height: 50%;
+        border-left: none;
+        border-top: 1px solid #ddd;
+    }
+
+    .split-content {
+        flex: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .split-view-overlay {
+        width: 95vw;
+        height: 95vh;
+        border-radius: 12px;
+    }
+
+    .split-sidebar {
+        max-height: 60%;
+    }
+
+    .sidebar-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .sidebar-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .config-scroll-content {
+        padding: 1rem;
+    }
+
+    .config-color-group {
+        grid-template-columns: 1fr;
+    }
+
+    .global-close-btn {
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+}
