@@ -57,7 +57,7 @@ export default function RegleLecture() {
           right: 0,
           top: 0,
           height: "calc(50% - 30px)",
-          background: "rgba(0, 0, 0, 0.15)",
+          background: "rgba(0, 0, 0, 0.05)",
           pointerEvents: "none",
           zIndex: 98,
         }}
@@ -70,7 +70,7 @@ export default function RegleLecture() {
           right: 0,
           bottom: 0,
           height: "calc(50% - 30px)",
-          background: "rgba(0, 0, 0, 0.15)",
+          background: "rgba(0, 0, 0, 0.05)",
           pointerEvents: "none",
           zIndex: 98,
         }}
