@@ -35,6 +35,7 @@ import WordDefinition from "@src/components/reader/WordDefinition";
 import ProgressTracker from "@src/components/reader/ProgressTracker";
 import ChatBot from "@src/components/reader/ChatBot";
 import FloatingControls from "@src/components/reader/FloatingControls";
+import Karaoke from "@src/components/reader/Karaoke";
 
 // Configuration du processeur Markdown
 const processor = unified()
@@ -241,6 +242,7 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
   
   <FloatingControls client:load>
     <VoiceCommand client:load />
+    <Karaoke client:load />
     {hasPdfSource && <ChatBot client:load docId={docId} />}
   </FloatingControls>
 
