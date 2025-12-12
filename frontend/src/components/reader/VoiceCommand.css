@@ -1,0 +1,316 @@
+/* Bouton flottant pour ouvrir le panneau */
+.voice-command-trigger {
+  /* Position gérée par le parent (FloatingControls) */
+  /* position: fixed; */
+  /* bottom: 2rem; */
+  /* right: 2rem; */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.voice-command-trigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+}
+
+.voice-command-trigger:active {
+  transform: scale(0.95);
+}
+
+/* Panneau de commande */
+.voice-command-panel {
+  position: fixed;
+  bottom: 6rem;
+  right: 2rem;
+  width: 400px;
+  max-width: calc(100vw - 4rem);
+  background: var(--bg-color, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 998;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.voice-command-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.voice-command-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color, #2c2c2c);
+}
+
+.voice-command-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-color, #2c2c2c);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.voice-command-close:hover {
+  opacity: 1;
+}
+
+/* Contenu */
+.voice-command-content {
+  padding: 1.25rem;
+}
+
+/* Input group */
+.voice-command-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.voice-command-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  background: var(--bg-color, #ffffff);
+  color: var(--text-color, #2c2c2c);
+  transition: border-color 0.2s;
+}
+
+.voice-command-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.voice-command-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Boutons */
+.voice-command-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.voice-command-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.voice-command-mic {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  min-width: 50px;
+}
+
+.voice-command-mic:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.voice-command-mic.listening {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.voice-command-mic.disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.voice-command-submit {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.voice-command-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.voice-command-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voice-command-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Feedback */
+.voice-command-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-color, #2c2c2c);
+  border-left: 3px solid rgba(0, 0, 0, 0.2);
+}
+
+.voice-command-feedback.success {
+  background: rgba(16, 185, 129, 0.1);
+  border-left-color: #10b981;
+  color: #059669;
+}
+
+.voice-command-feedback.error {
+  background: rgba(239, 68, 68, 0.1);
+  border-left-color: #ef4444;
+  color: #dc2626;
+}
+
+/* Exemples */
+.voice-command-examples {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.voice-command-examples-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color, #2c2c2c);
+  opacity: 0.7;
+}
+
+.voice-command-examples ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.voice-command-examples li {
+  font-size: 0.85rem;
+  color: #667eea;
+  cursor: pointer;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.voice-command-examples li:hover {
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .voice-command-trigger {
+    width: 50px;
+    height: 50px;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .voice-command-panel {
+    bottom: 5rem;
+    right: 1rem;
+    width: calc(100vw - 2rem);
+    left: 1rem;
+  }
+
+  .voice-command-buttons {
+    flex-direction: row;
+  }
+
+  .voice-command-btn {
+    min-height: 44px;
+  }
+}
+
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+  .voice-command-panel {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .voice-command-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .voice-command-input {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .voice-command-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .voice-command-examples {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}

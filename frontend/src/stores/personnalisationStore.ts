@@ -209,6 +209,20 @@ export const usePersonnalisationStore = create<
       // Setters thème
       setThemeMode: (mode) => {
         const themeColors = themesPredefinis[mode];
+        if (!themeColors) {
+          console.warn(
+            `Theme mode "${mode}" non trouvé dans themesPredefinis, utilisation de light par défaut`
+          );
+          set({
+            theme_mode: "light",
+            theme: {
+              ...get().theme,
+              couleur_fond: themesPredefinis.light.couleur_fond,
+              couleur_texte: themesPredefinis.light.couleur_texte,
+            },
+          });
+          return;
+        }
         set({
           theme_mode: mode,
           theme: {

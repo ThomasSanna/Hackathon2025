@@ -16,6 +16,7 @@ import rehypeStringify from "rehype-stringify";
 import remarkBreaks from "remark-breaks";
 import rehypeSlug from "rehype-slug";
 import rehypeMermaid from "rehype-mermaid";
+import VoiceCommand from "@src/components/reader/VoiceCommand";
 
 // Components
 // Components
@@ -33,6 +34,7 @@ import TextTransformations from "@src/components/reader/TextTransformations";
 import WordDefinition from "@src/components/reader/WordDefinition";
 import ProgressTracker from "@src/components/reader/ProgressTracker";
 import ChatBot from "@src/components/reader/ChatBot";
+import FloatingControls from "@src/components/reader/FloatingControls";
 
 // Configuration du processeur Markdown
 const processor = unified()
@@ -236,9 +238,11 @@ const currentFrontmatter = pages[0]?.frontmatter || {};
   <TextTransformations client:load />
   <WordDefinition client:load />
   <ProgressTracker client:only="react" docId={docId} />
-
-  <!-- ChatBot IA pour QnA sur le document -->
-  {hasPdfSource && <ChatBot client:load docId={docId} />}
+  
+  <FloatingControls client:load>
+    <VoiceCommand client:load />
+    {hasPdfSource && <ChatBot client:load docId={docId} />}
+  </FloatingControls>
 
   <!-- Version Desktop (Scroll Vertical Continu) -->
   <div class="document-container desktop-view" id="doc-container">

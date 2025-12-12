@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { marked } from "marked";
 
 // Configurer marked pour le rendu sécurisé
@@ -83,7 +84,7 @@ export default function ChatBot({ docId }: ChatBotProps) {
       {/* Bouton flottant pour ouvrir le chat */}
       <button
         onClick={() => setIsOpen(true)}
-        className="chatbot-toggle"
+        className="chatbot-toggle position "
         aria-label="Ouvrir le chat IA"
         title="Poser une question sur le document"
       >
@@ -106,7 +107,7 @@ export default function ChatBot({ docId }: ChatBotProps) {
       </button>
 
       {/* Modal du chat */}
-      {isOpen && (
+      {isOpen && createPortal(
         <div className="chatbot-overlay" onClick={() => setIsOpen(false)}>
           <div className="chatbot-modal" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
@@ -266,14 +267,16 @@ export default function ChatBot({ docId }: ChatBotProps) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <style>{`
         .chatbot-toggle {
-          position: fixed;
-          bottom: 2rem;
-          right: 2rem;
+          /* Position gérée par le parent (FloatingControls) */
+          /* position: fixed; */
+          /* bottom: 2rem; */
+          /* right: 2rem; */
           width: 56px;
           height: 56px;
           border-radius: 50%;
