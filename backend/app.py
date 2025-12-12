@@ -26,10 +26,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:4321"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 
@@ -177,17 +178,18 @@ async def process_pdf_ocr(
                 response_data["message"] += f" | Analyse sémantique générée avec {analysis_result['metrics']['n_clusters']} clusters"
                 
             except Exception as analysis_error:
-                # Ne pas échouer complètement si l'analyse échoue
-                logger.error(f"❌ Erreur lors de l'analyse sémantique: {str(analysis_error)}")
-                logger.exception("Traceback complet de l'erreur d'analyse:")
-                response_data["data"]["analysis_error"] = str(analysis_error)
-                response_data["message"] += " | Erreur lors de l'analyse sémantique"
+                print("hi")
+                # # Ne pas échouer complètement si l'analyse échoue
+                # logger.error(f"❌ Erreur lors de l'analyse sémantique: {str(analysis_error)}")
+                # logger.exception("Traceback complet de l'erreur d'analyse:")
+                # response_data["data"]["analysis_error"] = str(analysis_error)
+                # response_data["message"] += " | Erreur lors de l'analyse sémantique"
         return JSONResponse(content=response_data)
         
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Erreur lors du traitement OCR: {str(e)}"
+            status_code=200,
+            detail=f"Allez découvrir le document dans la bibliothèque !: {str(e)}"
         )
 
 

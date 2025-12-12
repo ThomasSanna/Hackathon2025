@@ -378,6 +378,7 @@ Génère une carte mentale avec:
             analysis_result = {
                 "metadata": {
                     "document_id": document_id,
+                    "source_files": [str(md_file) for md_file in markdown_files],
                     **metrics
                 },
                 "summary": summary.model_dump(),
@@ -391,7 +392,9 @@ Génère une carte mentale avec:
             logger.info(f"✓ Résultat JSON sauvegardé: {json_path}")
             
             # Sauvegarder la carte mentale Mermaid
-            mindmap_path = output_dir / "mind_map.md"
+            mindmap_dir = output_dir / "mind_map"
+            mindmap_dir.mkdir(parents=True, exist_ok=True)
+            mindmap_path = mindmap_dir / "mind_map.md"
             with open(mindmap_path, "w", encoding="utf-8") as f:
                 f.write(f"# Carte Mentale - {summary.title}\n\n")
                 f.write("```mermaid\n")
